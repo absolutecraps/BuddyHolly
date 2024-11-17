@@ -1,0 +1,61 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="index.html">My Media Archive</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav" id="folderMenu">
+            <!-- Top-level folders will be dynamically loaded here -->
+        </ul>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const response = await fetch('https://media-gallery.justsoicanpostheretoday.workers.dev/files/');
+        const data = await response.json();
+
+        const folderMenu = document.getElementById('folderMenu');
+
+        // Function to create dropdown menu items for subfolders
+        const createDropdownItems = (subfolders) => {
+            const dropdownMenu = document.createElement('ul');
+            dropdownMenu.className = 'dropdown-menu';
+
+            subfolders.forEach(subfolder => {
+                const dropdownItem = document.createElement('li');
+                const subfolderLink = document.createElement('a');
+                subfolderLink.className = 'dropdown-item';
+                subfolderLink.href = `files/${subfolder}`;
+                subfolderLink.innerText = subfolder;
+                dropdownItem.appendChild(subfolderLink);
+                dropdownMenu.appendChild(dropdownItem);
+            });
+
+            return dropdownMenu;
+        };
+
+        // Populate top-level folders in the navbar menu
+        for (const folder of data.folders) {
+            const navItem = document.createElement('li');
+            navItem.className = 'nav-item dropdown';
+            
+            const navLink = document.createElement('a');
+            navLink.className = 'nav-link dropdown-toggle';
+            navLink.href = `files/${folder}`;
+            navLink.id = `navbarDropdown${folder}`;
+            navLink.role = 'button';
+            navLink.innerText = folder;
+
+            navItem.appendChild(navLink);
+
+            // Fetch subfolders for each top-level folder
+            const subfolderResponse = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${folder}`);
+            const subfolderData = await subfolderResponse.json();
+            const dropdownMenu = createDropdownItems(subfolderData.folders);
+            navItem.appendChild(dropdownMenu);
+
+            folderMenu.appendChild(navItem);
+        }
+    });
+</script>
