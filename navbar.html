@@ -33,8 +33,10 @@
                 navItem.className = 'nav-item dropdown';
                 
                 const navLink = document.createElement('a');
-                navLink.className = 'nav-link';
+                navLink.className = 'nav-link dropdown-toggle';
                 navLink.href = `subfolder.html?folder=${folder}`;
+                navLink.id = `navbarDropdown${folder}`;
+                navLink.role = 'button';
                 navLink.innerText = folder;
 
                 navItem.appendChild(navLink);
@@ -47,3 +49,14 @@
         }
     });
 </script>
+
+<style>
+    .dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0;
+    }
+    .dropdown-menu {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+</style>
