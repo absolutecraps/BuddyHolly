@@ -99,7 +99,7 @@
                 folderMenu.innerHTML = '';
 
                 // Populate top-level folders in the navbar menu
-                data.folders.forEach(folder => {
+                for (const folder of data.folders) {
                     console.log(`Processing folder for navbar: ${folder}`);
                     const navItem = document.createElement('li');
                     navItem.className = 'nav-item dropdown';
@@ -115,23 +115,33 @@
                     const dropdownMenu = document.createElement('ul');
                     dropdownMenu.className = 'dropdown-menu';
 
-                    const subfolderResponse = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${folder}`);
-                    const subfolderData = await subfolderResponse.json();
+                    try {
+                        const subfolderResponse = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${folder}`);
+                        if (!subfolderResponse.ok) {
+                            console.error(`Failed to fetch subfolders for ${folder}:`, subfolderResponse.status, subfolderResponse.statusText);
+                            continue; // Skip this folder and move to the next
+                        }
 
-                    subfolderData.folders.forEach(subfolder => {
-                        const dropdownItem = document.createElement('li');
-                        const subfolderLink = document.createElement('a');
-                        subfolderLink.className = 'dropdown-item';
-                        subfolderLink.href = `subfolder.html?folder=${folder}/${subfolder}`;
-                        subfolderLink.innerText = subfolder;
-                        dropdownItem.appendChild(subfolderLink);
-                        dropdownMenu.appendChild(dropdownItem);
-                    });
+                        const subfolderData = await subfolderResponse.json();
+                        console.log(`Subfolders for ${folder} fetched successfully:`, subfolderData.folders);
+
+                        subfolderData.folders.forEach(subfolder => {
+                            const dropdownItem = document.createElement('li');
+                            const subfolderLink = document.createElement('a');
+                            subfolderLink.className = 'dropdown-item';
+                            subfolderLink.href = `subfolder.html?folder=${folder}/${subfolder}`;
+                            subfolderLink.innerText = subfolder;
+                            dropdownItem.appendChild(subfolderLink);
+                            dropdownMenu.appendChild(dropdownItem);
+                        });
+                    } catch (subfolderError) {
+                        console.error(`Error fetching subfolders for ${folder}:`, subfolderError);
+                    }
 
                     navItem.appendChild(navLink);
                     navItem.appendChild(dropdownMenu);
                     folderMenu.appendChild(navItem);
-                });
+                }
 
                 console.log("Navbar populated successfully");
             } catch (error) {
