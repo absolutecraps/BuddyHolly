@@ -32,24 +32,34 @@
                 console.log(`Processing folder: ${folder}`);
                 const navItem = document.createElement('li');
                 navItem.className = 'nav-item dropdown';
-                
+
                 const navLink = document.createElement('a');
                 navLink.className = 'nav-link dropdown-toggle';
-                navLink.href = `subfolder.html?folder=${folder}`;
+                navLink.href = `#`;
                 navLink.id = `navbarDropdown${folder}`;
                 navLink.role = 'button';
+                navLink.setAttribute('data-bs-toggle', 'dropdown');
                 navLink.innerText = folder;
 
-                navItem.appendChild(navLink);
+                const dropdownMenu = document.createElement('ul');
+                dropdownMenu.className = 'dropdown-menu';
 
-                // Fetch subfolders for each top-level folder
                 const subfolderResponse = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${folder}`);
                 const subfolderData = await subfolderResponse.json();
                 console.log(`Subfolders for ${folder} fetched successfully:`, subfolderData.folders);
 
-                const dropdownMenu = createDropdownItems(subfolderData.folders, folder);
-                navItem.appendChild(dropdownMenu);
+                subfolderData.folders.forEach(subfolder => {
+                    const dropdownItem = document.createElement('li');
+                    const subfolderLink = document.createElement('a');
+                    subfolderLink.className = 'dropdown-item';
+                    subfolderLink.href = `subfolder.html?folder=${folder}/${subfolder}`;
+                    subfolderLink.innerText = subfolder;
+                    dropdownItem.appendChild(subfolderLink);
+                    dropdownMenu.appendChild(dropdownItem);
+                });
 
+                navItem.appendChild(navLink);
+                navItem.appendChild(dropdownMenu);
                 folderMenu.appendChild(navItem);
             }
 
@@ -58,23 +68,6 @@
             console.error("Error fetching folders:", error);
         }
     });
-
-    function createDropdownItems(subfolders, parentFolder) {
-        const dropdownMenu = document.createElement('ul');
-        dropdownMenu.className = 'dropdown-menu';
-
-        subfolders.forEach(subfolder => {
-            const dropdownItem = document.createElement('li');
-            const subfolderLink = document.createElement('a');
-            subfolderLink.className = 'dropdown-item';
-            subfolderLink.href = `subfolder.html?folder=${parentFolder}/${subfolder}`;
-            subfolderLink.innerText = subfolder;
-            dropdownItem.appendChild(subfolderLink);
-            dropdownMenu.appendChild(dropdownItem);
-        });
-
-        return dropdownMenu;
-    }
 </script>
 
 <style>
