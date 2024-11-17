@@ -26,24 +26,6 @@
             const folderMenu = document.getElementById('folderMenu');
             console.log("Top-level folders fetched successfully:", data.folders);
 
-            // Function to create dropdown menu items for subfolders
-            const createDropdownItems = (subfolders, parentFolder) => {
-                const dropdownMenu = document.createElement('ul');
-                dropdownMenu.className = 'dropdown-menu';
-
-                subfolders.forEach(subfolder => {
-                    const dropdownItem = document.createElement('li');
-                    const subfolderLink = document.createElement('a');
-                    subfolderLink.className = 'dropdown-item';
-                    subfolderLink.href = `subfolder.html?folder=${parentFolder}/${subfolder}`;
-                    subfolderLink.innerText = subfolder;
-                    dropdownItem.appendChild(subfolderLink);
-                    dropdownMenu.appendChild(dropdownItem);
-                });
-
-                return dropdownMenu;
-            };
-
             // Populate top-level folders in the navbar menu
             for (const folder of data.folders) {
                 console.log(`Processing folder: ${folder}`);
@@ -51,22 +33,11 @@
                 navItem.className = 'nav-item dropdown';
                 
                 const navLink = document.createElement('a');
-                navLink.className = 'nav-link dropdown-toggle';
+                navLink.className = 'nav-link';
                 navLink.href = `subfolder.html?folder=${folder}`;
-                navLink.id = `navbarDropdown${folder}`;
-                navLink.role = 'button';
                 navLink.innerText = folder;
 
                 navItem.appendChild(navLink);
-
-                // Fetch subfolders for each top-level folder
-                const subfolderResponse = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${folder}`);
-                const subfolderData = await subfolderResponse.json();
-                console.log(`Subfolders for ${folder} fetched successfully:`, subfolderData.folders);
-
-                const dropdownMenu = createDropdownItems(subfolderData.folders, folder);
-                navItem.appendChild(dropdownMenu);
-
                 folderMenu.appendChild(navItem);
             }
 
@@ -76,14 +47,3 @@
         }
     });
 </script>
-
-<style>
-    .dropdown:hover .dropdown-menu {
-        display: block;
-        margin-top: 0;
-    }
-    .dropdown-menu {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-</style>
