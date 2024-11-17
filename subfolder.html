@@ -65,12 +65,14 @@
     <script>
         async function loadNavbar() {
             try {
+                console.log("Fetching navbar.html...");
                 const response = await fetch('navbar.html');
                 if (!response.ok) {
                     console.error("Failed to fetch navbar.html:", response.status, response.statusText);
                     return;
                 }
                 const navbarHtml = await response.text();
+                console.log("Navbar HTML fetched successfully");
                 document.getElementById('navbar').innerHTML = navbarHtml;
 
                 // Execute the script to fetch and populate folders
@@ -81,21 +83,24 @@
         }
 
         async function populateNavbarFolders() {
+            console.log("Fetching top-level folders for navbar...");
             try {
                 const response = await fetch('https://media-gallery.justsoicanpostheretoday.workers.dev/files/');
                 if (!response.ok) {
-                    console.error("Failed to fetch folders:", response.status, response.statusText);
+                    console.error("Failed to fetch folders for navbar:", response.status, response.statusText);
                     return;
                 }
 
                 const data = await response.json();
+                console.log("Top-level folders fetched for navbar:", data.folders);
                 const folderMenu = document.getElementById('folderMenu');
 
                 // Clear existing content in the folderMenu (if any)
                 folderMenu.innerHTML = '';
 
                 // Populate top-level folders in the navbar menu
-                data.folders.forEach(folder => {
+                for (const folder of data.folders) {
+                    console.log(`Processing folder for navbar: ${folder}`);
                     const navItem = document.createElement('li');
                     navItem.className = 'nav-item dropdown';
 
@@ -110,30 +115,43 @@
                     const dropdownMenu = document.createElement('ul');
                     dropdownMenu.className = 'dropdown-menu';
 
-                    const subfolderResponse = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${folder}`);
-                    const subfolderData = await subfolderResponse.json();
+                    try {
+                        const subfolderResponse = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${folder}`);
+                        if (!subfolderResponse.ok) {
+                            console.error(`Failed to fetch subfolders for ${folder}:`, subfolderResponse.status, subfolderResponse.statusText);
+                            continue; // Skip this folder and move to the next
+                        }
 
-                    subfolderData.folders.forEach(subfolder => {
-                        const dropdownItem = document.createElement('li');
-                        const subfolderLink = document.createElement('a');
-                        subfolderLink.className = 'dropdown-item';
-                        subfolderLink.href = `subfolder.html?folder=${folder}/${subfolder}`;
-                        subfolderLink.innerText = subfolder;
-                        dropdownItem.appendChild(subfolderLink);
-                        dropdownMenu.appendChild(dropdownItem);
-                    });
+                        const subfolderData = await subfolderResponse.json();
+                        console.log(`Subfolders for ${folder} fetched successfully:`, subfolderData.folders);
+
+                        subfolderData.folders.forEach(subfolder => {
+                            const dropdownItem = document.createElement('li');
+                            const subfolderLink = document.createElement('a');
+                            subfolderLink.className = 'dropdown-item';
+                            subfolderLink.href = `subfolder.html?folder=${folder}/${subfolder}`;
+                            subfolderLink.innerText = subfolder;
+                            dropdownItem.appendChild(subfolderLink);
+                            dropdownMenu.appendChild(dropdownItem);
+                        });
+                    } catch (subfolderError) {
+                        console.error(`Error fetching subfolders for ${folder}:`, subfolderError);
+                    }
 
                     navItem.appendChild(navLink);
                     navItem.appendChild(dropdownMenu);
                     folderMenu.appendChild(navItem);
-                });
+                }
+
+                console.log("Navbar populated successfully");
             } catch (error) {
-                console.error("Error fetching folders:", error);
+                console.error("Error fetching folders for navbar:", error);
             }
         }
 
         async function loadSubfolderContents(subfolder) {
             try {
+                console.log("Fetching subfolder contents...");
                 const response = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${subfolder}`);
                 if (!response.ok) {
                     console.error("Failed to fetch subfolder contents:", response.status, response.statusText);
@@ -141,6 +159,7 @@
                 }
 
                 const data = await response.json();
+                console.log("Subfolder contents fetched:", data);
 
                 document.getElementById('subfolderName').innerText = subfolder;
 
@@ -198,17 +217,21 @@
                     listItem.innerHTML = `<a href="${file.url}">${file.name}</a>`;
                     miscList.appendChild(listItem);
                 });
+
+                console.log("Subfolder contents populated successfully");
             } catch (error) {
                 console.error("Error fetching subfolder contents:", error);
             }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log("Loading subfolder page...");
             await loadNavbar();
 
             const urlParams = new URLSearchParams(window.location.search);
             const subfolder = urlParams.get('folder');
             if (subfolder) {
+                console.log(`Subfolder parameter found: ${subfolder}`);
                 await loadSubfolderContents(subfolder);
             } else {
                 console.error('No subfolder specified in the URL');
