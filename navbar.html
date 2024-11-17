@@ -29,14 +29,13 @@
 
             // Populate top-level folders in the navbar menu
             data.folders.forEach(folder => {
+                console.log(`Processing folder: ${folder}`);
                 const navItem = document.createElement('li');
                 navItem.className = 'nav-item dropdown';
                 
                 const navLink = document.createElement('a');
-                navLink.className = 'nav-link dropdown-toggle';
+                navLink.className = 'nav-link';
                 navLink.href = `subfolder.html?folder=${folder}`;
-                navLink.id = `navbarDropdown${folder}`;
-                navLink.role = 'button';
                 navLink.innerText = folder;
 
                 navItem.appendChild(navLink);
