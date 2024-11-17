@@ -43,11 +43,11 @@
                 console.log("Navbar HTML fetched successfully");
                 document.getElementById('navbar').innerHTML = navbarHtml;
 
-                // Execute the script tags within navbar.html
+                // Dynamically load and execute scripts within navbar.html
                 const scripts = document.querySelectorAll('#navbar script');
                 scripts.forEach(script => {
                     const newScript = document.createElement('script');
-                    newScript.text = script.text;
+                    newScript.textContent = script.textContent;
                     document.body.appendChild(newScript);
                 });
             } catch (error) {
