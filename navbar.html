@@ -26,6 +26,9 @@
             const folderMenu = document.getElementById('folderMenu');
             console.log("Top-level folders fetched successfully:", data.folders);
 
+            // Clear existing content in the folderMenu (if any)
+            folderMenu.innerHTML = '';
+
             // Populate top-level folders in the navbar menu
             for (const folder of data.folders) {
                 console.log(`Processing folder: ${folder}`);
