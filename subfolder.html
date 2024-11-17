@@ -1,72 +1,136 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="index.html">My Media Archive</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav" id="folderMenu">
-            <!-- Top-level folders will be dynamically loaded here -->
-        </ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subfolder Contents</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval';">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .file-thumbnail {
+            width: 100%;
+            height: auto;
+        }
+        .modal-file {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar"></div> <!-- Navbar will be dynamically loaded here -->
+
+    <div class="container mt-5">
+        <h1 id="subfolderName" class="mb-5">Subfolder Contents</h1>
+
+        <!-- Sections for displaying subfolder contents -->
+        <div id="foldersSection">
+            <h2>Folders</h2>
+            <ul id="foldersList" class="list-unstyled"></ul>
+        </div>
+
+        <div id="videosSection" class="mt-4">
+            <h2>Videos</h2>
+            <div class="row" id="videosList"></div>
+        </div>
+
+        <div id="imagesSection" class="mt-4">
+            <h2>Images</h2>
+            <div class="row" id="imagesList"></div>
+        </div>
+
+        <div id="miscSection" class="mt-4">
+            <h2>Miscellaneous Files</h2>
+            <ul id="miscList" class="list-unstyled"></ul>
+        </div>
     </div>
-</nav>
 
-<script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        const response = await fetch('https://media-gallery.justsoicanpostheretoday.workers.dev/files/');
-        const data = await response.json();
+    <!-- Modal for viewing images and videos -->
+    <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="modalContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        const folderMenu = document.getElementById('folderMenu');
+    <script>
+        async function loadNavbar() {
+            const response = await fetch('navbar.html');
+            const navbarHtml = await response.text();
+            document.getElementById('navbar').innerHTML = navbarHtml;
+        }
 
-        // Function to create dropdown menu items for subfolders
-        const createDropdownItems = (subfolders, parentFolder) => {
-            const dropdownMenu = document.createElement('ul');
-            dropdownMenu.className = 'dropdown-menu';
+        async function loadSubfolderContents(subfolder) {
+            const response = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${subfolder}`);
+            const data = await response.json();
 
-            subfolders.forEach(subfolder => {
-                const dropdownItem = document.createElement('li');
-                const subfolderLink = document.createElement('a');
-                subfolderLink.className = 'dropdown-item';
-                subfolderLink.href = `subfolder.html?folder=${parentFolder}/${subfolder}`;
-                subfolderLink.innerText = subfolder;
-                dropdownItem.appendChild(subfolderLink);
-                dropdownMenu.appendChild(dropdownItem);
+            document.getElementById('subfolderName').innerText = subfolder;
+
+            // Populate folders section
+            const foldersList = document.getElementById('foldersList');
+            data.folders.forEach(folder => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<a href="subfolder.html?folder=${subfolder}/${folder}">${folder}</a>`;
+                foldersList.appendChild(listItem);
             });
 
-            return dropdownMenu;
-        };
+            // Populate videos section
+            const videosList = document.getElementById('videosList');
+            data.videos.forEach(video => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4';
+                const img = document.createElement('img');
+                img.src = video.thumbnail_url;
+                img.className = 'img-thumbnail file-thumbnail';
+                img.dataset.bsToggle = 'modal';
+                img.dataset.bsTarget = '#fileModal';
+                img.addEventListener('click', () => {
+                    document.getElementById('modalContent').innerHTML = `<video controls class="modal-file"><source src="${video.url}" type="video/mp4">Your browser does not support the video tag.</video>`;
+                });
+                col.appendChild(img);
+                videosList.appendChild(col);
+            });
 
-        // Populate top-level folders in the navbar menu
-        for (const folder of data.folders) {
-            const navItem = document.createElement('li');
-            navItem.className = 'nav-item dropdown';
-            
-            const navLink = document.createElement('a');
-            navLink.className = 'nav-link dropdown-toggle';
-            navLink.href = `subfolder.html?folder=${folder}`;
-            navLink.id = `navbarDropdown${folder}`;
-            navLink.role = 'button';
-            navLink.innerText = folder;
+            // Populate images section
+            const imagesList = document.getElementById('imagesList');
+            data.images.forEach(image => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4';
+                const img = document.createElement('img');
+                img.src = image.url;
+                img.className = 'img-thumbnail file-thumbnail';
+                img.dataset.bsToggle = 'modal';
+                img.dataset.bsTarget = '#fileModal';
+                img.addEventListener('click', () => {
+                    document.getElementById('modalContent').innerHTML = `<img src="${image.url}" class="modal-file" alt="Image">`;
+                });
+                col.appendChild(img);
+                imagesList.appendChild(col);
+            });
 
-            navItem.appendChild(navLink);
-
-            // Fetch subfolders for each top-level folder
-            const subfolderResponse = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${folder}`);
-            const subfolderData = await subfolderResponse.json();
-            const dropdownMenu = createDropdownItems(subfolderData.folders, folder);
-            navItem.appendChild(dropdownMenu);
-
-            folderMenu.appendChild(navItem);
+            // Populate miscellaneous files section
+            const miscList = document.getElementById('miscList');
+            data.misc.forEach(file => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<a href="${file.url}">${file.name}</a>`;
+                miscList.appendChild(listItem);
+            });
         }
-    });
-</script>
 
-<style>
-    .dropdown:hover .dropdown-menu {
-        display: block;
-        margin-top: 0;
-    }
-    .dropdown-menu {
-        max-height: 400px;
-        overflow-y: auto;
-    }
-</style>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadNavbar();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const subfolder = urlParams.get('folder');
+            if (subfolder) {
+                await loadSubfolderContents(subfolder);
+            } else {
+                console.error('No subfolder specified in the URL');
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
