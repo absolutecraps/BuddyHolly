@@ -33,13 +33,23 @@
     <script>
         async function loadNavbar() {
             try {
+                console.log("Fetching navbar.html...");
                 const response = await fetch('navbar.html');
                 if (!response.ok) {
                     console.error("Failed to fetch navbar.html:", response.status, response.statusText);
                     return;
                 }
                 const navbarHtml = await response.text();
+                console.log("Navbar HTML fetched successfully");
                 document.getElementById('navbar').innerHTML = navbarHtml;
+
+                // Execute the script tags within navbar.html
+                const scripts = document.querySelectorAll('#navbar script');
+                scripts.forEach(script => {
+                    const newScript = document.createElement('script');
+                    newScript.text = script.text;
+                    document.body.appendChild(newScript);
+                });
             } catch (error) {
                 console.error("Error fetching navbar.html:", error);
             }
