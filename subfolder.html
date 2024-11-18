@@ -165,63 +165,79 @@
 
                 // Populate folders section
                 const foldersList = document.getElementById('foldersList');
+                let hasSubfolders = false;
                 data.folders.forEach(folder => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `<a href="subfolder.html?folder=${subfolder}/${folder}">${folder}</a>`;
-                    foldersList.appendChild(listItem);
+                    if (folder !== "thumbnails" && folder !== "tn") {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `<a href="subfolder.html?folder=${subfolder}/${folder}">${folder}</a>`;
+                        foldersList.appendChild(listItem);
+                        hasSubfolders = true;
+                    }
                 });
+                if (hasSubfolders) {
+                    document.getElementById('foldersSection').style.display = 'block';
+                }
 
                 // Populate videos section
                 const videosList = document.getElementById('videosList');
-                data.videos.forEach(video => {
-                    const col = document.createElement('div');
-                    col.className = 'col-md-4';
-                    const img = document.createElement('img');
-                    img.src = video.thumbnail_url;
-                    img.className = 'img-thumbnail file-thumbnail';
-                    img.dataset.bsToggle = 'modal';
-                    img.dataset.bsTarget = '#fileModal';
-                    img.addEventListener('click', () => {
-                        document.getElementById('modalContent').innerHTML = `<video controls class="modal-file"><source src="${video.url}" type="video/mp4">Your browser does not support the video tag.</video>`;
+                if (data.videos.length > 0) {
+                    data.videos.forEach(video => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-4';
+                        const img = document.createElement('img');
+                        img.src = video.thumbnail_url;
+                        img.className = 'img-thumbnail file-thumbnail';
+                        img.dataset.bsToggle = 'modal';
+                        img.dataset.bsTarget = '#fileModal';
+                        img.addEventListener('click', () => {
+                            document.getElementById('modalContent').innerHTML = `<video controls class="modal-file"><source src="${video.url}" type="video/mp4">Your browser does not support the video tag.</video>`;
+                        });
+                        col.appendChild(img);
+                        videosList.appendChild(col);
                     });
-                    col.appendChild(img);
-                    videosList.appendChild(col);
-                });
+                    document.getElementById('videosSection').style.display = 'block';
+                }
 
                 // Populate images section
                 const imagesList = document.getElementById('imagesList');
-                data.images.forEach(image => {
-                    const col = document.createElement('div');
-                    col.className = 'col-md-4';
+                if (data.images.length > 0) {
+                    data.images.forEach(image => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-4';
 
-                    // Use thumbnail for display
-                    const imgName = image.url.split('/').pop();
-                    const thumbnailUrl = `${image.url.split('/').slice(0, -1).join('/')}/thumbnail/${imgName.replace('.jpg', '_tn.jpg')}`;
-                    
-                    const img = document.createElement('img');
-                    img.src = thumbnailUrl;
-                    img.className = 'img-thumbnail file-thumbnail';
-                    img.alt = imgName; // Add alt attribute for accessibility
-                    img.onerror = () => { // Handle missing thumbnails
-                        console.error(`Thumbnail not found: ${thumbnailUrl}`);
-                        img.src = image.url; // Fall back to full image if thumbnail is missing
-                    };
-                    img.dataset.bsToggle = 'modal';
-                    img.dataset.bsTarget = '#fileModal';
-                    img.addEventListener('click', () => {
-                        document.getElementById('modalContent').innerHTML = `<img src="${image.url}" class="modal-file" alt="Image">`;
+                        // Use thumbnail for display
+                        const imgName = image.url.split('/').pop();
+                        const thumbnailUrl = `${image.url.split('/').slice(0, -1).join('/')}/thumbnail/${imgName.replace('.jpg', '_tn.jpg')}`;
+                        
+                        const img = document.createElement('img');
+                        img.src = thumbnailUrl;
+                        img.className = 'img-thumbnail file-thumbnail';
+                        img.alt = imgName; // Add alt attribute for accessibility
+                        img.onerror = () => { // Handle missing thumbnails
+                            console.error(`Thumbnail not found: ${thumbnailUrl}`);
+                            img.src = image.url; // Fall back to full image if thumbnail is missing
+                        };
+                        img.dataset.bsToggle = 'modal';
+                        img.dataset.bsTarget = '#fileModal';
+                        img.addEventListener('click', () => {
+                            document.getElementById('modalContent').innerHTML = `<img src="${image.url}" class="modal-file" alt="Image">`;
+                        });
+                        col.appendChild(img);
+                        imagesList.appendChild(col);
                     });
-                    col.appendChild(img);
-                    imagesList.appendChild(col);
-                });
+                    document.getElementById('imagesSection').style.display = 'block';
+                }
 
                 // Populate miscellaneous files section
                 const miscList = document.getElementById('miscList');
-                data.misc.forEach(file => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `<a href="${file.url}">${file.name}</a>`;
-                    miscList.appendChild(listItem);
-                });
+                if (data.misc.length > 0) {
+                    data.misc.forEach(file => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `<a href="${file.url}">${file.name}</a>`;
+                        miscList.appendChild(listItem);
+                    });
+                    document.getElementById('miscSection').style.display = 'block';
+                }
 
                 console.log("Subfolder contents populated successfully");
             } catch (error) {
@@ -242,6 +258,7 @@
                 console.error('No subfolder specified in the URL');
             }
         });
+
     </script>
     <script src="path/to/bootstrap.bundle.min.js"></script> <!-- Use local Bootstrap JS file -->
 </body>
