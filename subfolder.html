@@ -167,7 +167,7 @@
                 const foldersList = document.getElementById('foldersList');
                 let hasSubfolders = false;
                 data.folders.forEach(folder => {
-                    if (folder !== "thumbnails" && folder !== "tn") {
+                    if (folder !== "thumbnail" && folder !== "tn") {
                         const listItem = document.createElement('li');
                         listItem.innerHTML = `<a href="subfolder.html?folder=${subfolder}/${folder}">${folder}</a>`;
                         foldersList.appendChild(listItem);
@@ -184,13 +184,30 @@
                     data.videos.forEach(video => {
                         const col = document.createElement('div');
                         col.className = 'col-md-4';
+
+                        // Use full-sized thumbnail for display
+                        const imgName = video.thumbnail_url.split('/').pop();
+                        const fullThumbnailUrl = video.thumbnail_url.replace('_tn', '');
+
                         const img = document.createElement('img');
-                        img.src = video.thumbnail_url;
+                        img.src = fullThumbnailUrl;
                         img.className = 'img-thumbnail file-thumbnail';
+                        img.alt = imgName;
                         img.dataset.bsToggle = 'modal';
                         img.dataset.bsTarget = '#fileModal';
                         img.addEventListener('click', () => {
-                            document.getElementById('modalContent').innerHTML = `<video controls class="modal-file"><source src="${video.url}" type="video/mp4">Your browser does not support the video tag.</video>`;
+                            document.getElementById('modalContent').innerHTML = `
+                                <img src="${fullThumbnailUrl}" class="modal-file" alt="Video Thumbnail">
+                                <button id="playButton" class="btn btn-primary mt-2">Play</button>
+                            `;
+                            document.getElementById('playButton').addEventListener('click', () => {
+                                document.getElementById('modalContent').innerHTML = `
+                                    <video controls class="modal-file">
+                                        <source src="${video.url}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                `;
+                            });
                         });
                         col.appendChild(img);
                         videosList.appendChild(col);
@@ -258,6 +275,7 @@
                 console.error('No subfolder specified in the URL');
             }
         });
+
 
     </script>
     <script src="path/to/bootstrap.bundle.min.js"></script> <!-- Use local Bootstrap JS file -->
