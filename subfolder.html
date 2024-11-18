@@ -201,6 +201,11 @@
                     const img = document.createElement('img');
                     img.src = thumbnailUrl;
                     img.className = 'img-thumbnail file-thumbnail';
+                    img.alt = imgName; // Add alt attribute for accessibility
+                    img.onerror = () => { // Handle missing thumbnails
+                        console.error(`Thumbnail not found: ${thumbnailUrl}`);
+                        img.src = image.url; // Fall back to full image if thumbnail is missing
+                    };
                     img.dataset.bsToggle = 'modal';
                     img.dataset.bsTarget = '#fileModal';
                     img.addEventListener('click', () => {
