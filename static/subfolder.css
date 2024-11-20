@@ -1,0 +1,22 @@
+.file-thumbnail {
+            width: auto;
+            height: auto;
+        }
+        .modal-file {
+            width: auto;
+            height: auto;
+        }
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+        .dropdown-menu {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .file-thumbnail:hover {
+            cursor: pointer;
+        }
+        .preview-thumbnail:hover {
+            cursor: pointer;
+        }

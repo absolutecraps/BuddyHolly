@@ -1,0 +1,17 @@
+.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+        .dropdown-menu {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .dropdown-toggle::after {
+            display: none; /* Remove caret from dropdown */
+        }
+        .file-thumbnail:hover {
+            cursor: pointer;
+        }
+        .preview-thumbnail:hover {
+            cursor: pointer;
+        }
