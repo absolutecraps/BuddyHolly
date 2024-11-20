@@ -204,8 +204,10 @@ async function loadSubfolderContents(subfolder) {
 function openImageModal(index, images) {
     const image = images[index];
     const modalContent = document.getElementById('modalContent');
+    const modalDialog = document.querySelector('.modal-dialog');
+    modalDialog.classList.add('modal-dialog-centered');
     modalContent.innerHTML = `
-        <img src="${image.url}" class="modal-file" style="width: 100%; height: auto;" alt="Image">
+        <img src="${image.url}" class="modal-file" alt="Image">
         <div class="image-previews mt-3">
             ${getPreviewThumbnails(index, images)}
         </div>
@@ -247,8 +249,6 @@ function openImageModal(index, images) {
     });
 }
 
-
-
 function addZoomFunctionality() {
     const modalFile = document.querySelector('.modal-file');
     let scale = 1;
@@ -265,7 +265,6 @@ function addZoomFunctionality() {
     });
 }
 
-
 function getPreviewThumbnails(index, images) {
     const previews = [];
     const start = Math.max(0, index - 5);
@@ -279,6 +278,7 @@ function getPreviewThumbnails(index, images) {
     }
     return previews.join('');
 }
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Loading subfolder page...");

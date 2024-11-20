@@ -8,6 +8,8 @@
     margin: 0 auto;
     max-width: 100%;
     max-height: calc(100vh - 100px); /* Ensure modal content fits within the browser window */
+    width: auto; /* Ensure images keep their original aspect ratio */
+    height: auto; /* Ensure images keep their original aspect ratio */
 }
 .modal-dialog-centered {
     display: flex;
@@ -36,3 +38,4 @@
 .preview-thumbnail:hover {
     cursor: pointer;
 }
+
