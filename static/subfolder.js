@@ -205,12 +205,13 @@ function openImageModal(index, images) {
     const image = images[index];
     const modalContent = document.getElementById('modalContent');
     modalContent.innerHTML = `
-        <img src="${image.url}" class="modal-file" alt="Image">
+        <img src="${image.url}" class="modal-file" style="width: 100%; height: auto;" alt="Image">
         <div class="image-previews mt-3">
             ${getPreviewThumbnails(index, images)}
         </div>
     `;
 
+    
     // Add zoom functionality
     addZoomFunctionality();
 
