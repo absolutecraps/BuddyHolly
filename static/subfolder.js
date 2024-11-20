@@ -211,7 +211,6 @@ function openImageModal(index, images) {
         </div>
     `;
 
-    
     // Add zoom functionality
     addZoomFunctionality();
 
@@ -270,6 +269,7 @@ function addZoomFunctionality() {
         modalFile.style.transform = `scale(${scale})`;
     });
 }
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Loading subfolder page...");

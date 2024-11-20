@@ -1,39 +1,42 @@
 .file-thumbnail {
-            width: auto;
-            height: auto;
-        }
-        .modal-file {
-            max-width: 100%;
-            max-height: 100%;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            object-fit: contain; /* Ensures the image fits within the modal without distortion */
-        }
-        .modal-dialog {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-        .modal-content {
-            background: transparent; /* Optional: Make background transparent for better visuals */
-            border: none; /* Optional: Remove modal borders */
-        }
-        .dropdown:hover .dropdown-menu {
-            display: block;
-            margin-top: 0;
-        }
-        .dropdown-menu {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .file-thumbnail:hover {
-            cursor: pointer;
-        }
-        .preview-thumbnail:hover {
-            cursor: pointer;
-        }
+    width: auto;
+    height: auto;
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+.modal-file {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: calc(100vh - 100px); /* Ensure modal content fits within the browser window */
+}
+.modal-dialog-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 1rem); /* Center the modal vertically */
+}
+.image-previews img {
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
+.modal-content {
+    background: transparent; /* Optional: Make background transparent for better visuals */
+    border: none; /* Optional: Remove modal borders */
+}
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0;
+}
+.dropdown-menu {
+    max-height: 400px;
+    overflow-y: auto;
+}
+.file-thumbnail:hover {
+    cursor: pointer;
+}
+.preview-thumbnail:hover {
+    cursor: pointer;
+}
 
 
-        
+
+
