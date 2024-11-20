@@ -247,6 +247,25 @@ function openImageModal(index, images) {
     });
 }
 
+
+
+function addZoomFunctionality() {
+    const modalFile = document.querySelector('.modal-file');
+    let scale = 1;
+    modalFile.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (e.deltaY > 0) {
+            scale += 0.1;
+        } else {
+            scale -= 0.1;
+        }
+        scale = Math.min(Math.max(0.5, scale), 3); // Limit zoom to between 0.5x and 3x
+        modalFile.style.transform = `scale(${scale})`;
+        modalFile.style.transformOrigin = 'center'; // Ensure zoom happens from the center
+    });
+}
+
+
 function getPreviewThumbnails(index, images) {
     const previews = [];
     const start = Math.max(0, index - 5);
@@ -260,16 +279,6 @@ function getPreviewThumbnails(index, images) {
     }
     return previews.join('');
 }
-
-function addZoomFunctionality() {
-    const modalFile = document.querySelector('.modal-file');
-    modalFile.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        const scale = e.deltaY > 0 ? 1.1 : 0.9;
-        modalFile.style.transform = `scale(${scale})`;
-    });
-}
-
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Loading subfolder page...");
