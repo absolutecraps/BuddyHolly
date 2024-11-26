@@ -225,6 +225,14 @@ function openImageModal(index, images) {
         resizedHeight = availableHeight;
         resizedWidth = aspectRatio * resizedHeight;
       }
+
+      const imgElement = modalContent.querySelector('img');
+      let zoomLevel = 1;
+    
+      imgElement.addEventListener('click', () => {
+        zoomLevel = zoomLevel === 1 ? 2 : 1;
+        imgElement.style.transform = `scale(${zoomLevel})`;
+      });
   
       modalContent.innerHTML = `
         <div style="text-align: center;">
@@ -237,19 +245,19 @@ function openImageModal(index, images) {
     };
   }
 
-function getPreviewThumbnails(index, images) {
+  function getPreviewThumbnails(index, images) {
     const previews = [];
     const start = Math.max(0, index - 5);
     const end = Math.min(images.length, index + 6);
     for (let i = start; i < end; i++) {
-        if (i !== index) {
-            previews.push(`
-                <img src="${images[i].thumbnail_url}" class="preview-thumbnail" alt="Preview Image" onclick="openImageModal(${i}, ${JSON.stringify(images).replace(/"/g, '&quot;')})">
-            `);
-        }
+      if (i !== index) {
+        previews.push(`
+          <img src="${images[i].thumbnail_url}" class="preview-thumbnail" alt="Preview Image" onclick="openImageModal(${i}, ${JSON.stringify(images).replace(/"/g, '&quot;')})">
+        `);
+      }
     }
     return previews.join('');
-}
+  }
 
 
 function addZoomFunctionality() {
