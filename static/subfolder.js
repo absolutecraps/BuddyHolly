@@ -112,6 +112,7 @@ async function loadSubfolderContents(subfolder) {
 
         document.getElementById('subfolderName').innerText = subfolder;
 
+        // Populate folders section
         const foldersList = document.getElementById('foldersList');
         let hasSubfolders = false;
         data.folders.forEach(folder => {
@@ -126,6 +127,7 @@ async function loadSubfolderContents(subfolder) {
             document.getElementById('foldersSection').style.display = 'block';
         }
 
+        // Populate videos section
         const videosList = document.getElementById('videosList');
         if (data.videos.length > 0) {
             data.videos.forEach(video => {
@@ -133,7 +135,7 @@ async function loadSubfolderContents(subfolder) {
                 col.className = 'col-md-4';
 
                 const imgName = video.thumbnail_url.split('/').pop();
-                const fullThumbnailUrl = video.thumbnail_url.replace('_tn', '');
+                const fullThumbnailUrl = video.thumbnail_url.replace('_tn', '.jpg');
 
                 const img = document.createElement('img');
                 img.src = fullThumbnailUrl;
@@ -167,6 +169,7 @@ async function loadSubfolderContents(subfolder) {
             document.getElementById('videosSection').style.display = 'block';
         }
 
+        // Populate images section
         const imagesList = document.getElementById('imagesList');
         const validImages = data.images.filter(image => !image.url.includes('mp4')).sort((a, b) => a.url.localeCompare(b.url));
         if (validImages.length > 0) {
@@ -198,6 +201,7 @@ async function loadSubfolderContents(subfolder) {
             document.getElementById('imagesSection').style.display = 'block';
         }
 
+        // Populate miscellaneous files section
         const miscList = document.getElementById('miscList');
         if (data.misc.length > 0) {
             data.misc.forEach(file => {

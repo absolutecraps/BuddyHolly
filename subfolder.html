@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subfolder Contents</title>
-    <link href="static/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="static/subfolder.css">
+    <link href="static/bootstrap.min.css" rel="stylesheet"> <!-- Use local Bootstrap CSS file -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css"> <!-- Lightbox 2 CSS -->
+    <link rel="stylesheet" href="static/subfolder.css">
 </head>
 <body>
-    <div id="navbar"></div> 
+    <div id="navbar"></div> <!-- Navbar will be dynamically loaded here -->
 
     <div class="container mt-5">
         <h1 id="subfolderName" class="mb-5">Subfolder Contents</h1>
 
+        <!-- Sections for displaying subfolder contents -->
         <div id="foldersSection">
             <h2>Folders</h2>
             <ul id="foldersList" class="list-unstyled"></ul>
@@ -35,6 +36,7 @@
         </div>
     </div>
 
+    <!-- Modal for viewing videos -->
     <div id="fileModal" class="modal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -50,8 +52,8 @@
         </div>
     </div>
 
-    <script src="static/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script> <!-- Lightbox 2 JS -->
+    <script src="static/bootstrap.bundle.min.js"></script> <!-- Use local Bootstrap JS file -->
     <script src="static/subfolder.js"></script>
 </body>
 </html>
