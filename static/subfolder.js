@@ -226,19 +226,7 @@ function openImageModal(index, images) {
   
     // Add event listener for zooming the image
     modalImage.addEventListener('click', () => {
-      if (modalImage.style.transform === 'scale(2)') {
-        modalImage.style.transform = 'scale(1)';
-      } else {
-        modalImage.style.transform = 'scale(2)';
-      }
-    });
-  
-    // Add event listeners for clicking on preview thumbnails
-    const previewThumbnails = document.querySelectorAll('.image-preview');
-    previewThumbnails.forEach((thumbnail, i) => {
-      thumbnail.addEventListener('click', () => {
-        openImageModal(i, images);
-      });
+      modalImage.classList.toggle('zoomed');
     });
   }
 
@@ -249,7 +237,7 @@ function openImageModal(index, images) {
     for (let i = start; i < end; i++) {
       if (i !== index) {
         previews.push(`
-          <img src="${images[i].thumbnail_url}" class="preview-thumbnail" alt="Preview Image" onclick="openImageModal(${i}, ${JSON.stringify(images).replace(/"/g, '&quot;')})">
+          <img src="${images[i].thumbnail_url}" class="preview-thumbnail" alt="Preview Image" onclick="openImageModal(${i}, images)">
         `);
       }
     }
