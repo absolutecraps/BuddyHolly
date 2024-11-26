@@ -157,12 +157,11 @@ async function loadSubfolderContents(subfolder) {
       const validImages = data.images.filter(image => !image.url.includes('mp4')).sort((a, b) => a.url.localeCompare(b.url));
       if (validImages.length > 0) {
         validImages.forEach((image, index) => {
-          const imageItem = createImageItem(image, index);
+          const imageItem = createImageItem(image, index, imagesList);
           imagesList.appendChild(imageItem);
         });
         document.getElementById('imagesSection').style.display = 'block';
-      }
-  
+      }  
       // Misc section
       const miscList = document.getElementById('miscList');
       if (data.misc.length > 0) {
@@ -211,37 +210,35 @@ async function loadSubfolderContents(subfolder) {
     return col;
   }
   
-  function createImageItem(image, index) {
+  function createImageItem(image, index, gallerySelector) {
     const col = document.createElement('div');
     col.className = 'col-md-4';
   
     const imgName = image.url.split('/').pop();
-    const thumbnailUrl = `<span class="math-inline">\{image\.url\.split\('/'\)\.slice\(0, \-1\)\.join\('/'\)\}/thumbnail/</span>{imgName.replace('.jpg', '_tn.jpg')}`;
-    const openPhotoSwipe = function(index, galleryElement, disableAnimation, fromURL) {
-        const pswpElement = document.querySelectorAll('.pswp')[0];
-        const items = parseThumbnailElements(galleryElement);
-        if (items.length === 0) {
-            console.error("No items to display in PhotoSwipe");
-            return;
-        }
-        const options = {
-            galleryUID: galleryElement.getAttribute('data-pswp-uid'),
-            index: index,
-            getThumbBoundsFn: (index) => {
-                const thumbnail = items[index] ? items[index].el : null;
-                if (!thumbnail) {
-                    return { x: 0, y: 0, w: 0 };
-                }
-                const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
-                const rect = thumbnail.getBoundingClientRect();
-                return { x: rect.left, y: rect.top + pageYScroll, w: rect.width };
-            }
-        };
-
-        // Pass data to PhotoSwipe and initialize it
-        const gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
-        gallery.init();
+    const thumbnailUrl = `${image.url.split('/').slice(0, -1).join('/')}/thumbnail/${imgName.replace('.jpg', '_tn.jpg')}`;
+  
+    const a = document.createElement('a');
+    a.href = image.url;
+    a.dataset.type = 'image';
+    a.dataset.index = index;
+  
+    const img = document.createElement('img');
+    img.src = thumbnailUrl;
+    img.className = 'img-thumbnail file-thumbnail';
+    img.alt = imgName;
+    img.onerror = () => {
+      console.error(`Thumbnail not found: ${thumbnailUrl}`);
+      img.src = image.url;
     };
+  
+    a.appendChild(img);
+    col.appendChild(a);
+  
+    // Initialize PhotoSwipe for this image
+    initPhotoSwipeFromDOM(gallerySelector, a);
+  
+    return col;
+  }
 
     const galleryElements = document.querySelectorAll(gallerySelector);
 
