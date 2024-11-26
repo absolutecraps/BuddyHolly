@@ -84,46 +84,6 @@ async function populateNavbarFolders() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Loading subfolder page...");
-    await loadNavbar();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const subfolder = urlParams.get('folder');
-    if (subfolder) {
-        console.log(`Subfolder parameter found: ${subfolder}`);
-        await loadSubfolderContents(subfolder);
-    } else {
-        console.error('No subfolder specified in the URL');
-    }
-
-    // Initialize Fancybox
-    Fancybox.bind('[data-fancybox="gallery"]', {
-        Thumbs: {
-            autoStart: true,
-        },
-        Toolbar: {
-            display: ["close"]
-        },
-        afterLoad: (instance, current) => {
-            const $image = current.$image ? current.$image[0] : null;
-            if (!$image) return;
-
-            let scale = 1;
-            const maxScale = 3; // Maximum scale (300% of the original size)
-
-            $image.addEventListener('click', () => {
-                if (scale < maxScale) {
-                    scale *= 1.25; // Increase scale by 125%
-                } else {
-                    scale = 1; // Reset to original size
-                }
-                $image.style.transform = `scale(${scale})`;
-            });
-        }
-    });
-});
-
 async function loadSubfolderContents(subfolder) {
     try {
         console.log("Fetching subfolder contents...");
@@ -138,7 +98,6 @@ async function loadSubfolderContents(subfolder) {
 
         document.getElementById('subfolderName').innerText = subfolder;
 
-        // Populate folders section
         const foldersList = document.getElementById('foldersList');
         let hasSubfolders = false;
         data.folders.forEach(folder => {
@@ -153,14 +112,12 @@ async function loadSubfolderContents(subfolder) {
             document.getElementById('foldersSection').style.display = 'block';
         }
 
-        // Populate videos section
         const videosList = document.getElementById('videosList');
         if (data.videos.length > 0) {
             data.videos.forEach(video => {
                 const col = document.createElement('div');
                 col.className = 'col-md-4';
 
-                // Use full-sized thumbnail for display
                 const imgName = video.thumbnail_url.split('/').pop();
                 const fullThumbnailUrl = video.thumbnail_url.replace('_tn', '');
 
@@ -172,15 +129,23 @@ async function loadSubfolderContents(subfolder) {
                     console.error(`Thumbnail not found: ${fullThumbnailUrl}`);
                     img.src = video.thumbnail_url;
                 };
-                img.dataset.bsToggle = 'modal';
-                img.dataset.bsTarget = '#fileModal';
                 img.addEventListener('click', () => {
                     document.getElementById('modalContent').innerHTML = `
-                        <video controls class="modal-file">
-                            <source src="${video.url}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
+                        <img src="${fullThumbnailUrl}" class="modal-file" alt="Video Thumbnail" style="max-width: 100%; max-height: 100%;">
                     `;
+                    const playButton = document.getElementById('playButton');
+                    playButton.onclick = () => {
+                        document.getElementById('modalContent').innerHTML = `
+                            <video controls class="modal-file" style="max-width: 100%; max-height: 100%;">
+                                <source src="${video.url}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        `;
+                        playButton.style.display = 'none';
+                    };
+                    playButton.style.display = 'block';
+                    const modal = new bootstrap.Modal(document.getElementById('fileModal'));
+                    modal.show();
                 });
                 col.appendChild(img);
                 videosList.appendChild(col);
@@ -188,7 +153,6 @@ async function loadSubfolderContents(subfolder) {
             document.getElementById('videosSection').style.display = 'block';
         }
 
-        // Populate images section
         const imagesList = document.getElementById('imagesList');
         const validImages = data.images.filter(image => !image.url.includes('mp4')).sort((a, b) => a.url.localeCompare(b.url));
         if (validImages.length > 0) {
@@ -219,7 +183,6 @@ async function loadSubfolderContents(subfolder) {
             document.getElementById('imagesSection').style.display = 'block';
         }
 
-        // Populate miscellaneous files section
         const miscList = document.getElementById('miscList');
         if (data.misc.length > 0) {
             data.misc.forEach(file => {
@@ -235,3 +198,43 @@ async function loadSubfolderContents(subfolder) {
         console.error("Error fetching subfolder contents:", error);
     }
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("Loading subfolder page...");
+    await loadNavbar();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const subfolder = urlParams.get('folder');
+    if (subfolder) {
+        console.log(`Subfolder parameter found: ${subfolder}`);
+        await loadSubfolderContents(subfolder);
+    } else {
+        console.error('No subfolder specified in the URL');
+    }
+
+    // Initialize Fancybox
+    Fancybox.bind('[data-fancybox="gallery"]', {
+        Thumbs: {
+            autoStart: true,
+        },
+        Toolbar: {
+            display: ["close"]
+        },
+        afterLoad: (instance, current) => {
+            const $image = current.$image ? current.$image[0] : null;
+            if (!$image) return;
+
+            let scale = 1;
+            const maxScale = 3;
+
+            $image.addEventListener('click', () => {
+                if (scale < maxScale) {
+                    scale *= 1.25;
+                } else {
+                    scale = 1;
+                }
+                $image.style.transform = `scale(${scale})`;
+            });
+        }
+    });
+});
