@@ -244,7 +244,7 @@ function initPhotoSwipeFromDOM(gallerySelector) {
             galleryUID: galleryElement.getAttribute('data-pswp-uid'),
             index: index,
             getThumbBoundsFn: (index) => {
-                const thumbnail = items[index].el;
+                const thumbnail = items[index] ? items[index].el : null;
                 if (!thumbnail) {
                     return { x: 0, y: 0, w: 0 };
                 }
