@@ -84,6 +84,46 @@ async function populateNavbarFolders() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("Loading subfolder page...");
+    await loadNavbar();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const subfolder = urlParams.get('folder');
+    if (subfolder) {
+        console.log(`Subfolder parameter found: ${subfolder}`);
+        await loadSubfolderContents(subfolder);
+    } else {
+        console.error('No subfolder specified in the URL');
+    }
+
+    // Initialize Fancybox
+    Fancybox.bind('[data-fancybox="gallery"]', {
+        Thumbs: {
+            autoStart: true,
+        },
+        Toolbar: {
+            display: ["close"]
+        },
+        afterLoad: (instance, current) => {
+            const $image = current.$image ? current.$image[0] : null;
+            if (!$image) return;
+
+            let scale = 1;
+            const maxScale = 3; // Maximum scale (300% of the original size)
+
+            $image.addEventListener('click', () => {
+                if (scale < maxScale) {
+                    scale *= 1.25; // Increase scale by 125%
+                } else {
+                    scale = 1; // Reset to original size
+                }
+                $image.style.transform = `scale(${scale})`;
+            });
+        }
+    });
+});
+
 async function loadSubfolderContents(subfolder) {
     try {
         console.log("Fetching subfolder contents...");
@@ -136,17 +176,11 @@ async function loadSubfolderContents(subfolder) {
                 img.dataset.bsTarget = '#fileModal';
                 img.addEventListener('click', () => {
                     document.getElementById('modalContent').innerHTML = `
-                        <img src="${fullThumbnailUrl}" class="modal-file" alt="Video Thumbnail">
-                        <button id="playButton" class="btn btn-primary mt-2">Play</button>
+                        <video controls class="modal-file">
+                            <source src="${video.url}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                     `;
-                    document.getElementById('playButton').addEventListener('click', () => {
-                        document.getElementById('modalContent').innerHTML = `
-                            <video controls class="modal-file">
-                                <source src="${video.url}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        `;
-                    });
                 });
                 col.appendChild(img);
                 videosList.appendChild(col);
@@ -201,41 +235,3 @@ async function loadSubfolderContents(subfolder) {
         console.error("Error fetching subfolder contents:", error);
     }
 }
-
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Loading subfolder page...");
-    await loadNavbar();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const subfolder = urlParams.get('folder');
-    if (subfolder) {
-        console.log(`Subfolder parameter found: ${subfolder}`);
-        await loadSubfolderContents(subfolder);
-    } else {
-        console.error('No subfolder specified in the URL');
-    }
-
-    // Initialize Fancybox
-    Fancybox.bind('[data-fancybox="gallery"]', {
-        Thumbs: {
-            autoStart: true,
-        },
-        Toolbar: {
-            display: ["close"]
-        },
-        afterLoad: (instance, current) => {
-            const $image = current.$image[0];
-            let scale = 1;
-            const maxScale = 3; // Maximum scale (300% of the original size)
-
-            $image.addEventListener('click', () => {
-                if (scale < maxScale) {
-                    scale *= 1.25; // Increase scale by 125%
-                } else {
-                    scale = 1; // Reset to original size
-                }
-                $image.style.transform = `scale(${scale})`;
-            });
-        }
-    });
-});
