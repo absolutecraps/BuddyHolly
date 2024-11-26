@@ -38,4 +38,40 @@
 .preview-thumbnail:hover {
     cursor: pointer;
 }
+.modal-dialog {
+    height: 100%;
+    margin: 0;
+}
 
+.modal-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.image-previews {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    gap: 5px;
+    background-color: #f8f9fa; /* Light background for preview section */
+}
+
+.image-previews img {
+    max-width: 50px;
+    max-height: 50px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.image-previews img:hover {
+    transform: scale(1.2);
+}

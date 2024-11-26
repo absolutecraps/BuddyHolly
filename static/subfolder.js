@@ -206,48 +206,45 @@ function openImageModal(index, images) {
     const modalContent = document.getElementById('modalContent');
     const modalDialog = document.querySelector('.modal-dialog');
     modalDialog.classList.add('modal-dialog-centered');
+
+    // Calculate available height
+    const windowHeight = window.innerHeight;
+    const previewHeight = 100; // Adjust based on preview section height
+    const availableHeight = windowHeight - previewHeight - 50; // Include padding/margins
+
+    const imgElement = new Image();
+    imgElement.src = image.url;
+    imgElement.onload = () => {
+        if (imgElement.height > availableHeight) {
+            imgElement.style.height = `${availableHeight}px`;
+            imgElement.style.width = 'auto';
+        }
+    };
+
     modalContent.innerHTML = `
-        <img src="${image.url}" class="modal-file" alt="Image">
+        <div style="text-align: center;">
+            <img src="${image.url}" class="modal-file" alt="Image" style="max-height: ${availableHeight}px;">
+        </div>
         <div class="image-previews mt-3">
             ${getPreviewThumbnails(index, images)}
         </div>
     `;
-
-    // Add zoom functionality
-    addZoomFunctionality();
-
-    // Scroll and drag functionality
-    const modalFile = document.querySelector('.modal-file');
-    let isDragging = false;
-    let startX, startY, scrollLeft, scrollTop;
-
-    modalFile.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        startX = e.pageX - modalFile.offsetLeft;
-        startY = e.pageY - modalFile.offsetTop;
-        scrollLeft = modalFile.scrollLeft;
-        scrollTop = modalFile.scrollTop;
-    });
-
-    modalFile.addEventListener('mouseleave', () => {
-        isDragging = false;
-    });
-
-    modalFile.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
-
-    modalFile.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        const x = e.pageX - modalFile.offsetLeft;
-        const y = e.pageY - modalFile.offsetTop;
-        const walkX = (x - startX) * 2;
-        const walkY = (y - startY) * 2;
-        modalFile.scrollLeft = scrollLeft - walkX;
-        modalFile.scrollTop = scrollTop - walkY;
-    });
 }
+
+function getPreviewThumbnails(index, images) {
+    const previews = [];
+    const start = Math.max(0, index - 5);
+    const end = Math.min(images.length, index + 6);
+    for (let i = start; i < end; i++) {
+        if (i !== index) {
+            previews.push(`
+                <img src="${images[i].thumbnail_url}" class="preview-thumbnail" alt="Preview Image" onclick="openImageModal(${i}, ${JSON.stringify(images).replace(/"/g, '&quot;')})">
+            `);
+        }
+    }
+    return previews.join('');
+}
+
 
 function addZoomFunctionality() {
     const modalFile = document.querySelector('.modal-file');
@@ -264,21 +261,6 @@ function addZoomFunctionality() {
         modalFile.style.transformOrigin = 'center'; // Ensure zoom happens from the center
     });
 }
-
-function getPreviewThumbnails(index, images) {
-    const previews = [];
-    const start = Math.max(0, index - 5);
-    const end = Math.min(images.length, index + 6);
-    for (let i = start; i < end; i++) {
-        if (i !== index) {
-            previews.push(`
-                <img src="${images[i].thumbnail_url}" class="preview-thumbnail" alt="Preview Image" onclick="openImageModal(${i}, ${JSON.stringify(images)})">
-            `);
-        }
-    }
-    return previews.join('');
-}
-
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Loading subfolder page...");
