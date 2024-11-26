@@ -84,6 +84,20 @@ async function populateNavbarFolders() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("Loading subfolder page...");
+    await loadNavbar();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const subfolder = urlParams.get('folder');
+    if (subfolder) {
+        console.log(`Subfolder parameter found: ${subfolder}`);
+        await loadSubfolderContents(subfolder);
+    } else {
+        console.error('No subfolder specified in the URL');
+    }
+});
+
 async function loadSubfolderContents(subfolder) {
     try {
         console.log("Fetching subfolder contents...");
@@ -165,7 +179,8 @@ async function loadSubfolderContents(subfolder) {
 
                 const a = document.createElement('a');
                 a.href = image.url;
-                a.dataset.fancybox = 'gallery';
+                a.dataset.lightbox = 'gallery';
+                a.dataset.title = imgName;
 
                 const img = document.createElement('img');
                 img.src = thumbnailUrl;
@@ -198,43 +213,3 @@ async function loadSubfolderContents(subfolder) {
         console.error("Error fetching subfolder contents:", error);
     }
 }
-
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Loading subfolder page...");
-    await loadNavbar();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const subfolder = urlParams.get('folder');
-    if (subfolder) {
-        console.log(`Subfolder parameter found: ${subfolder}`);
-        await loadSubfolderContents(subfolder);
-    } else {
-        console.error('No subfolder specified in the URL');
-    }
-
-    // Initialize Fancybox
-    Fancybox.bind('[data-fancybox="gallery"]', {
-        Thumbs: {
-            autoStart: true,
-        },
-        Toolbar: {
-            display: ["close"]
-        },
-        afterLoad: (instance, current) => {
-            const $image = current.$image ? current.$image[0] : null;
-            if (!$image) return;
-
-            let scale = 1;
-            const maxScale = 3;
-
-            $image.addEventListener('click', () => {
-                if (scale < maxScale) {
-                    scale *= 1.25;
-                } else {
-                    scale = 1;
-                }
-                $image.style.transform = `scale(${scale})`;
-            });
-        }
-    });
-});
