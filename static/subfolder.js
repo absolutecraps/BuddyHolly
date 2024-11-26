@@ -1,3 +1,6 @@
+/*  Created using ChatGPT, Gemini and Copilot Novemeber 2024 */
+
+
 async function loadNavbar() {
     try {
         console.log("Fetching navbar.html...");
