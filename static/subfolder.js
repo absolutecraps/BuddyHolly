@@ -1,5 +1,4 @@
-/*  Created using ChatGPT, Gemini and Copilot Novemeber 2024 */
-
+/*  Created using ChatGPT, Gemini and Copilot November 2024 */
 
 async function loadNavbar() {
     try {
@@ -86,20 +85,6 @@ async function populateNavbarFolders() {
         console.error("Error fetching folders for navbar:", error);
     }
 }
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Loading subfolder page...");
-    await loadNavbar();
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const subfolder = urlParams.get('folder');
-    if (subfolder) {
-        console.log(`Subfolder parameter found: ${subfolder}`);
-        await loadSubfolderContents(subfolder);
-    } else {
-        console.error('No subfolder specified in the URL');
-    }
-});
-
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Loading subfolder page...");
     await loadNavbar();
@@ -222,7 +207,6 @@ async function loadSubfolderContents(subfolder) {
         console.error("Error fetching subfolder contents:", error);
     }
 }
-
 function initPhotoSwipeFromDOM(gallerySelector) {
     const parseThumbnailElements = function(el) {
         const items = [];
