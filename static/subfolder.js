@@ -222,6 +222,10 @@ function initPhotoSwipeFromDOM(gallerySelector) {
         const thumbElements = el.querySelectorAll('a[data-type="image"], img[data-type="video"]');
 
         thumbElements.forEach((el) => {
+            if (el.dataset.type === 'folder') {
+                return; // Skip folder links
+            }
+
             const item = {
                 src: el.href || el.src,
                 w: el.naturalWidth || 800,
@@ -233,10 +237,13 @@ function initPhotoSwipeFromDOM(gallerySelector) {
 
             if (el.dataset.type === 'video') {
                 item.html = `
-                    <video controls style="width:100%; height:100%;">
-                        <source src="${el.src}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                    <div style="text-align: center;">
+                        <video controls style="width:100%; height:auto;">
+                            <source src="${el.src}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <button id="playButton" class="btn btn-primary mt-3">Play Video</button>
+                    </div>
                 `;
             }
 
@@ -249,20 +256,19 @@ function initPhotoSwipeFromDOM(gallerySelector) {
     const openPhotoSwipe = function (index, galleryElement) {
         const pswpElement = document.querySelectorAll('.pswp')[0];
         const items = parseThumbnailElements(galleryElement);
+
         if (items.length === 0) {
             console.error("No items to display in PhotoSwipe");
             return;
         }
+
         const options = {
             galleryUID: galleryElement.getAttribute('data-pswp-uid'),
             index: index,
             getThumbBoundsFn: (index) => {
-                const thumbnail = items[index] ? items[index].el : null;
-                if (!thumbnail) {
-                    return { x: 0, y: 0, w: 0 };
-                }
-                const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
+                const thumbnail = items[index].el;
                 const rect = thumbnail.getBoundingClientRect();
+                const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
                 return { x: rect.left, y: rect.top + pageYScroll, w: rect.width };
             },
         };
@@ -276,17 +282,10 @@ function initPhotoSwipeFromDOM(gallerySelector) {
     galleryElements.forEach((galleryElement, galleryIndex) => {
         galleryElement.setAttribute('data-pswp-uid', galleryIndex + 1);
 
-        galleryElement.querySelectorAll('img[data-type="video"]').forEach((img) => {
-            img.addEventListener('click', (e) => {
+        galleryElement.querySelectorAll('img[data-type="video"], a[data-type="image"]').forEach((el) => {
+            el.addEventListener('click', (e) => {
                 e.preventDefault();
-                openPhotoSwipe(parseInt(img.dataset.index, 10), galleryElement);
-            });
-        });
-
-        galleryElement.querySelectorAll('a[data-type="image"]').forEach((a) => {
-            a.addEventListener('click', (e) => {
-                e.preventDefault();
-                openPhotoSwipe(parseInt(a.dataset.index, 10), galleryElement);
+                openPhotoSwipe(parseInt(el.dataset.index, 10), galleryElement);
             });
         });
     });
