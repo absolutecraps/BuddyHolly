@@ -240,6 +240,10 @@ function initPhotoSwipeFromDOM(gallerySelector) {
     const openPhotoSwipe = function(index, galleryElement, disableAnimation, fromURL) {
         const pswpElement = document.querySelectorAll('.pswp')[0];
         const items = parseThumbnailElements(galleryElement);
+        if (items.length === 0) {
+            console.error("No items to display in PhotoSwipe");
+            return;
+        }
         const options = {
             galleryUID: galleryElement.getAttribute('data-pswp-uid'),
             index: index,
