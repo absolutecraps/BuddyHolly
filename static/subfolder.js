@@ -102,143 +102,112 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadSubfolderContents(subfolder) {
     try {
-        console.log("Fetching subfolder contents...");
-        const response = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${subfolder}`);
-        if (!response.ok) {
-            console.error("Failed to fetch subfolder contents:", response.status, response.statusText);
-            return;
+      console.log("Fetching subfolder contents...");
+      const response = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${subfolder}`);
+  
+      if (!response.ok) {
+        console.error("Failed to fetch subfolder contents:", response.status, response.statusText);
+        return;
+      }
+  
+      const data = await response.json();
+      console.log("Subfolder contents fetched:", data);
+  
+      // Update subfolder name element
+      document.getElementById('subfolderName').textContent = subfolder;
+  
+      // Clear existing content more efficiently
+      clearContent(['foldersList', 'videosList', 'imagesList', 'miscList']);
+  
+      // Folders section
+      const foldersList = document.getElementById('foldersList');
+      let hasSubfolders = false;
+      data.folders.forEach(folder => {
+        if (folder !== "thumbnail" && folder !== "tn") {
+          const listItem = createSubfolderListItem(folder, subfolder);
+          foldersList.appendChild(listItem);
+          hasSubfolders = true;
         }
-
-        const data = await response.json();
-        console.log("Subfolder contents fetched:", data);
-
-        document.getElementById('subfolderName').innerText = subfolder;
-
-        // Clear existing content to prevent duplication
-        document.getElementById('foldersList').innerHTML = '';
-        document.getElementById('videosList').innerHTML = '';
-        document.getElementById('imagesList').innerHTML = '';
-        document.getElementById('miscList').innerHTML = '';
-
-        const foldersList = document.getElementById('foldersList');
-        let hasSubfolders = false;
-        data.folders.forEach(folder => {
-            if (folder !== "thumbnail" && folder !== "tn") {
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `<a href="subfolder.html?folder=${subfolder}/${folder}">${folder}</a>`;
-                foldersList.appendChild(listItem);
-                hasSubfolders = true;
-            }
+      });
+      if (hasSubfolders) {
+        document.getElementById('foldersSection').style.display = 'block';
+      }
+  
+      // Videos section
+      const videosList = document.getElementById('videosList');
+      if (data.videos.length > 0) {
+        data.videos.forEach((video, index) => {
+          const videoItem = createVideoItem(video, index);
+          videosList.appendChild(videoItem);
         });
-        if (hasSubfolders) {
-            document.getElementById('foldersSection').style.display = 'block';
-        }
-
-        const videosList = document.getElementById('videosList');
-        if (data.videos.length > 0) {
-            data.videos.forEach((video, index) => {
-                const col = document.createElement('div');
-                col.className = 'col-md-4';
-
-                const imgName = video.thumbnail_url.split('/').pop();
-                const fullThumbnailUrl = video.thumbnail_url.replace('_tn', '.jpg');
-
-                const img = document.createElement('img');
-                img.src = fullThumbnailUrl;
-                img.className = 'img-thumbnail file-thumbnail';
-                img.alt = imgName;
-                img.onerror = () => {
-                    console.error(`Thumbnail not found: ${fullThumbnailUrl}`);
-                    img.src = video.thumbnail_url;
-                };
-                img.dataset.index = index;
-                img.dataset.type = 'video';
-                col.appendChild(img);
-                videosList.appendChild(col);
-            });
-            document.getElementById('videosSection').style.display = 'block';
-        }
-
-        const imagesList = document.getElementById('imagesList');
-        const validImages = data.images.filter(image => !image.url.includes('mp4')).sort((a, b) => a.url.localeCompare(b.url));
-        if (validImages.length > 0) {
-            validImages.forEach((image, index) => {
-                const col = document.createElement('div');
-                col.className = 'col-md-4';
-
-                const imgName = image.url.split('/').pop();
-                const thumbnailUrl = `${image.url.split('/').slice(0, -1).join('/')}/thumbnail/${imgName.replace('.jpg', '_tn.jpg')}`;
-
-                const a = document.createElement('a');
-                a.href = image.url;
-                a.dataset.type = 'image';
-                a.dataset.index = index;
-
-                const img = document.createElement('img');
-                img.src = thumbnailUrl;
-                img.className = 'img-thumbnail file-thumbnail';
-                img.alt = imgName;
-                img.onerror = () => {
-                    console.error(`Thumbnail not found: ${thumbnailUrl}`);
-                    img.src = image.url;
-                };
-
-                a.appendChild(img);
-                col.appendChild(a);
-                imagesList.appendChild(col);
-            });
-            document.getElementById('imagesSection').style.display = 'block';
-        }
-
-        const miscList = document.getElementById('miscList');
-        if (data.misc.length > 0) {
-            data.misc.forEach(file => {
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `<a href="${file.url}">${file.name}</a>`;
-                miscList.appendChild(listItem);
-            });
-            document.getElementById('miscSection').style.display = 'block';
-        }
-
-        console.log("Subfolder contents populated successfully");
-
-        // Initialize Photoswipe
-        initPhotoSwipeFromDOM('.container');
+        document.getElementById('videosSection').style.display = 'block';
+      }
+  
+      // Images section
+      const imagesList = document.getElementById('imagesList');
+      const validImages = data.images.filter(image => !image.url.includes('mp4')).sort((a, b) => a.url.localeCompare(b.url));
+      if (validImages.length > 0) {
+        validImages.forEach((image, index) => {
+          const imageItem = createImageItem(image, index);
+          imagesList.appendChild(imageItem);
+        });
+        document.getElementById('imagesSection').style.display = 'block';
+      }
+  
+      // Misc section
+      const miscList = document.getElementById('miscList');
+      if (data.misc.length > 0) {
+        data.misc.forEach(file => {
+          const listItem = createMiscListItem(file);
+          miscList.appendChild(listItem);
+        });
+        document.getElementById('miscSection').style.display = 'block';
+      }
+  
+      console.log("Subfolder contents populated successfully");
+  
+      // Initialize Photoswipe
+      initPhotoSwipeFromDOM('.container');
     } catch (error) {
-        console.error("Error fetching subfolder contents:", error);
+      console.error("Error fetching subfolder contents:", error);
     }
-}
-
-function initPhotoSwipeFromDOM(gallerySelector) {
-    const parseThumbnailElements = function(el) {
-        const items = [];
-        const thumbElements = el.querySelectorAll('a[data-type="image"], img[data-type="video"]');
-
-        thumbElements.forEach((el, index) => {
-            const item = {
-                src: el.href || el.src,
-                w: el.naturalWidth || 800, // default width
-                h: el.naturalHeight || 600, // default height
-                title: el.alt || '',
-                msrc: el.querySelector('img') ? el.querySelector('img').src : el.src,
-                el: el
-            };
-
-            if (el.dataset.type === 'video') {
-                item.html = `
-                    <video controls style="width:100%; height:100%;">
-                        <source src="${el.src}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                `;
-            }
-
-            items.push(item);
-        });
-
-        return items;
+  }
+  
+  // Helper functions for creating list items
+  function createSubfolderListItem(folder, subfolder) {
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `<a href="subfolder.html?folder=<span class="math-inline">\{subfolder\}/</span>{folder}">${folder}</a>`;
+    return listItem;
+  }
+  
+  function createVideoItem(video, index) {
+    const col = document.createElement('div');
+    col.className = 'col-md-4';
+  
+    const imgName = video.thumbnail_url.split('/').pop();
+    const fullThumbnailUrl = video.thumbnail_url.replace('_tn', '.jpg');
+  
+    const img = document.createElement('img');
+    img.src = fullThumbnailUrl;
+    img.className = 'img-thumbnail file-thumbnail';
+    img.alt = imgName;
+    img.onerror = () => {
+      console.error(`Thumbnail not found: ${fullThumbnailUrl}`);
+      img.src = video.thumbnail_url;
     };
-
+    img.dataset.index = index;
+    img.dataset.type = 'video';
+  
+    col.appendChild(img);
+    return col;
+  }
+  
+  function createImageItem(image, index) {
+    const col = document.createElement('div');
+    col.className = 'col-md-4';
+  
+    const imgName = image.url.split('/').pop();
+    const thumbnailUrl = `<span class="math-inline">\{image\.url\.split\('/'\)\.slice\(0, \-1\)\.join\('/'\)\}/thumbnail/</span>{imgName.replace('.jpg', '_tn.jpg')}`;
     const openPhotoSwipe = function(index, galleryElement, disableAnimation, fromURL) {
         const pswpElement = document.querySelectorAll('.pswp')[0];
         const items = parseThumbnailElements(galleryElement);
