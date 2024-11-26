@@ -86,7 +86,6 @@ async function populateNavbarFolders() {
         console.error("Error fetching folders for navbar:", error);
     }
 }
-
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Loading subfolder page...");
     await loadNavbar();
@@ -99,14 +98,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         console.error('No subfolder specified in the URL');
     }
-
-    // Initialize Lightbox 2
-    lightbox.option({
-        'resizeDuration': 200,
-        'wrapAround': true,
-        'albumLabel': "Image %1 of %2",
-        'alwaysShowNavOnTouchDevices': true
-    });
 });
 
 async function loadSubfolderContents(subfolder) {
@@ -139,7 +130,7 @@ async function loadSubfolderContents(subfolder) {
 
         const videosList = document.getElementById('videosList');
         if (data.videos.length > 0) {
-            data.videos.forEach(video => {
+            data.videos.forEach((video, index) => {
                 const col = document.createElement('div');
                 col.className = 'col-md-4';
 
@@ -154,24 +145,8 @@ async function loadSubfolderContents(subfolder) {
                     console.error(`Thumbnail not found: ${fullThumbnailUrl}`);
                     img.src = video.thumbnail_url;
                 };
-                img.addEventListener('click', () => {
-                    document.getElementById('modalContent').innerHTML = `
-                        <img src="${fullThumbnailUrl}" class="modal-file" alt="Video Thumbnail" style="max-width: 100%; max-height: 100%;">
-                    `;
-                    const playButton = document.getElementById('playButton');
-                    playButton.onclick = () => {
-                        document.getElementById('modalContent').innerHTML = `
-                            <video controls class="modal-file" style="max-width: 100%; max-height: 100%;">
-                                <source src="${video.url}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        `;
-                        playButton.style.display = 'none';
-                    };
-                    playButton.style.display = 'block';
-                    const modal = new bootstrap.Modal(document.getElementById('fileModal'));
-                    modal.show();
-                });
+                img.dataset.index = index;
+                img.dataset.type = 'video';
                 col.appendChild(img);
                 videosList.appendChild(col);
             });
@@ -190,8 +165,8 @@ async function loadSubfolderContents(subfolder) {
 
                 const a = document.createElement('a');
                 a.href = image.url;
-                a.dataset.lightbox = 'gallery';
-                a.dataset.title = imgName;
+                a.dataset.type = 'image';
+                a.dataset.index = index;
 
                 const img = document.createElement('img');
                 img.src = thumbnailUrl;
@@ -220,7 +195,66 @@ async function loadSubfolderContents(subfolder) {
         }
 
         console.log("Subfolder contents populated successfully");
+
+        // Initialize Photoswipe
+        initPhotoSwipeFromDOM('.container');
     } catch (error) {
         console.error("Error fetching subfolder contents:", error);
     }
+}
+
+function initPhotoSwipeFromDOM(gallerySelector) {
+    const parseThumbnailElements = function(el) {
+        const items = [];
+        const thumbElements = el.querySelectorAll('a[data-type="image"], img[data-type="video"]');
+
+        thumbElements.forEach((el, index) => {
+            const item = {
+                src: el.href || el.src,
+                w: el.naturalWidth || 800, // default width
+                h: el.naturalHeight || 600, // default height
+                title: el.alt || '',
+                msrc: el.querySelector('img').src,
+                el: el
+            };
+
+            if (el.dataset.type === 'video') {
+                item.html = `
+                    <video controls style="width:100%; height:100%;">
+                        <source src="${el.src}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `;
+            }
+
+            items.push(item);
+        });
+
+        return items;
+    };
+
+    const openPhotoSwipe = function(index, galleryElement, disableAnimation, fromURL) {
+        const pswpElement = document.querySelectorAll('.pswp')[0];
+        const items = parseThumbnailElements(galleryElement);
+        const options = {
+            galleryUID: galleryElement.getAttribute('data-pswp-uid'),
+            index: index
+        };
+
+        // Pass data to PhotoSwipe and initialize it
+        const gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
+        gallery.init();
+    };
+
+    const galleryElements = document.querySelectorAll(gallerySelector);
+
+    galleryElements.forEach((galleryElement, galleryIndex) => {
+        galleryElement.setAttribute('data-pswp-uid', galleryIndex + 1);
+        galleryElement.addEventListener('click', function(e) {
+            if (e.target.tagName === 'IMG' || e.target.tagName === 'A') {
+                e.preventDefault();
+                openPhotoSwipe(parseInt(e.target.dataset.index, 10), galleryElement);
+            }
+        });
+    });
 }

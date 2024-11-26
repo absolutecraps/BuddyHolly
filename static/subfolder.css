@@ -111,3 +111,31 @@
 .modal-content.zoomed {
     object-fit: fill; /* Fill the container, potentially stretching the image */
 }
+
+/* Photoswipe Custom Styles */
+.pswp__bg {
+    background-color: rgba(0, 0, 0, 0.8); /* Dark background for Photoswipe */
+}
+
+.pswp__top-bar,
+.pswp__caption {
+    color: #fff; /* White text for controls and captions */
+}
+
+.pswp__button--arrow--left:before,
+.pswp__button--arrow--right:before {
+    border-color: #fff; /* White arrows for navigation */
+}
+
+.pswp__preloader__icn {
+    color: #fff; /* White preloader icon */
+}
+
+/* Ensure that the video fits well within the modal */
+.pswp__video-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
