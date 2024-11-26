@@ -222,6 +222,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
         Toolbar: {
             display: ["close"]
+        },
+        afterLoad: (instance, current) => {
+            const $image = current.$image[0];
+            let scale = 1;
+            const maxScale = 3; // Maximum scale (300% of the original size)
+
+            $image.addEventListener('click', () => {
+                if (scale < maxScale) {
+                    scale *= 1.25; // Increase scale by 125%
+                } else {
+                    scale = 1; // Reset to original size
+                }
+                $image.style.transform = `scale(${scale})`;
+            });
         }
     });
 });
