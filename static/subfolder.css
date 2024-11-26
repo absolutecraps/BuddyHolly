@@ -1,12 +1,13 @@
-/*  Created using ChatGPT, Gemini and Copilot Novemeber 2024 */
-
+/* Thumbnail styling */
 .file-thumbnail {
-    width: auto;
+    display: block;
+    width: 100%; /* Standardized size */
     height: auto;
-    cursor: pointer; /* Change cursor to pointer on hover */
+    cursor: pointer;
 }
 
-.modal-file {
+/* Modal image styling */
+.modal-image {
     display: block;
     margin: 0 auto;
     max-width: 100%;
@@ -14,6 +15,7 @@
     object-fit: contain; /* Maintain aspect ratio */
 }
 
+/* Modal content */
 .modal-content {
     display: flex;
     justify-content: center;
@@ -22,6 +24,7 @@
     max-height: calc(100vh - 150px);
 }
 
+/* Center modal vertically */
 .modal-dialog-centered {
     display: flex;
     justify-content: center;
@@ -29,63 +32,18 @@
     min-height: calc(100vh - 1rem); /* Center the modal vertically */
 }
 
-.modal-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-
-#playButton {
-    display: none;
-    margin-top: 20px;
-}
-
-.thumbnail-overlay {
-    position: relative;
-}
-
-.thumbnail-overlay::before {
-    content: "";
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.thumbnail-overlay:hover::before {
-    opacity: 1; /* Show overlay on hover */
-}
-
-.thumbnail-overlay img {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
+/* Modal background */
+.modal, .pswp__bg {
     background-color: rgba(0, 0, 0, 0.8);
 }
 
-.caption {
-    text-align: center;
-    margin-bottom: 10px;
+/* Play button styling */
+#playButton {
+    display: block; /* Default to visible */
+    margin-top: 20px;
 }
 
+/* Image previews */
 .image-previews {
     display: flex;
     justify-content: center;
@@ -99,6 +57,7 @@
     cursor: pointer;
 }
 
+/* Close button */
 .close {
     position: absolute;
     top: 25px;
@@ -107,45 +66,4 @@
     font-weight: bold;
     color: #fff;
     cursor: pointer;
-}
-
-
-.modal-content.zoomed {
-    object-fit: fill; /* Fill the container, potentially stretching the image */
-}
-
-/* Photoswipe Custom Styles */
-.pswp__bg {
-    background-color: rgba(0, 0, 0, 0.8); /* Dark background for Photoswipe */
-}
-
-.pswp__top-bar,
-.pswp__caption {
-    color: #fff; /* White text for controls and captions */
-}
-
-.pswp__button--arrow--left:before,
-.pswp__button--arrow--right:before {
-    border-color: #fff; /* White arrows for navigation */
-}
-
-.pswp__preloader__icn {
-    color: #fff; /* White preloader icon */
-}
-
-/* Ensure that the video fits well within the modal */
-.pswp__video-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-}
-
-.pswp__img {
-    object-fit: contain; /* Ensure images maintain their aspect ratio */
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
 }

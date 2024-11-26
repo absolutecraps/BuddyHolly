@@ -145,6 +145,7 @@ async function loadSubfolderContents(subfolder) {
 
         const foldersList = document.getElementById('foldersList');
         data.folders.forEach((folder) => {
+            if (folder === "thumbnail" || folder === "tn") return; // Exclude "thumbnail" and "tn"
             const listItem = createSubfolderListItem(folder, subfolder);
             foldersList.appendChild(listItem);
         });
@@ -168,27 +169,66 @@ async function loadSubfolderContents(subfolder) {
 }
 
 
+
 function createVideoItem(video, index) {
     const col = document.createElement('div');
     col.className = 'col-md-4';
 
-    const imgName = video.thumbnail_url.split('/').pop();
-    const fullThumbnailUrl = video.thumbnail_url.replace('_tn', '.jpg');
+    const thumbnailUrl = video.thumbnail_url;
+    const videoUrl = video.url.replace('_tn', ''); // Get the full video image (e.g., video1.jpg)
 
     const img = document.createElement('img');
-    img.src = fullThumbnailUrl;
+    img.src = thumbnailUrl;
     img.className = 'img-thumbnail file-thumbnail';
-    img.alt = imgName;
-    img.onerror = () => {
-        console.error(`Thumbnail not found: ${fullThumbnailUrl}`);
-        img.src = video.thumbnail_url;
-    };
-    img.dataset.index = index;
+    img.alt = `Video ${index}`;
     img.dataset.type = 'video';
+    img.dataset.index = index;
+
+    img.addEventListener('click', () => openVideoModal(videoUrl, index)); // Open the video modal on click
 
     col.appendChild(img);
     return col;
 }
+
+// Open video modal
+function openVideoModal(videoUrl, index) {
+    const modalContent = document.getElementById('modalContent');
+    modalContent.innerHTML = `
+        <div style="text-align: center;">
+            <img src="${videoUrl}" class="modal-file" alt="Video">
+            <button id="playButton" class="btn btn-primary mt-3">Play Video</button>
+            <div class="image-previews mt-3">
+                ${getVideoPreviewThumbnails(index)}
+            </div>
+        </div>
+    `;
+
+    const playButton = document.getElementById('playButton');
+    playButton.addEventListener('click', () => {
+        const videoElement = document.createElement('video');
+        videoElement.controls = true;
+        videoElement.style.width = '100%';
+        videoElement.src = videoUrl.replace('.jpg', '.mp4'); // Replace .jpg with .mp4 to get the video file
+        modalContent.innerHTML = '';
+        modalContent.appendChild(videoElement);
+        videoElement.play();
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById('fileModal'));
+    modal.show();
+}
+
+// Generate video preview thumbnails
+function getVideoPreviewThumbnails(currentIndex) {
+    return data.videos
+        .map((video, index) => {
+            if (index === currentIndex) return ''; // Skip the current video
+            const thumbnailUrl = video.thumbnail_url;
+            return `<img src="${thumbnailUrl}" class="preview-thumbnail" onclick="openVideoModal('${video.url.replace('_tn', '')}', ${index})">`;
+        })
+        .join('');
+}
+
 
 function createImageItem(image, index) {
     const col = document.createElement('div');
@@ -221,39 +261,32 @@ function initPhotoSwipeFromDOM(gallerySelector) {
     const parseThumbnailElements = function (el) {
         const items = [];
         const thumbElements = el.querySelectorAll('a[data-type="image"], img[data-type="video"]');
-
-        thumbElements.forEach((el) => {
-            if (el.dataset.type === 'folder') {
-                return; // Skip folder links
-            }
-
+    
+        thumbElements.forEach((el, index) => { // Add 'index' here
             const item = {
                 src: el.href || el.src,
-                w: el.naturalWidth || 800,
-                h: el.naturalHeight || 600,
+                w: el.naturalWidth || 800, // Default width if not available
+                h: el.naturalHeight || 600, // Default height if not available
                 title: el.alt || '',
                 msrc: el.querySelector('img') ? el.querySelector('img').src : el.src,
                 el: el,
             };
-
+    
             if (el.dataset.type === 'video') {
                 item.html = `
                     <div style="text-align: center;">
-                        <video id="videoElement-${index}" style="width:100%; height:auto;">
-                            <source src="${el.src}" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
+                        <img src="${el.src}" class="modal-file" alt="Video">
                         <button id="playButton-${index}" class="btn btn-primary mt-3">Play Video</button>
                     </div>
                 `;
             }
-            
-
+    
             items.push(item);
         });
-
+    
         return items;
     };
+    
 
     const openPhotoSwipe = function (index, galleryElement) {
         const pswpElement = document.querySelectorAll('.pswp')[0];
