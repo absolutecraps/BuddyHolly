@@ -202,34 +202,40 @@ async function loadSubfolderContents(subfolder) {
 }
 
 function openImageModal(index, images) {
-    const image = images[index];
     const modalContent = document.getElementById('modalContent');
     const modalDialog = document.querySelector('.modal-dialog');
     modalDialog.classList.add('modal-dialog-centered');
-
-    // Calculate available height
+  
+    // Calculate available height for the image
     const windowHeight = window.innerHeight;
-    const previewHeight = 100; // Adjust based on preview section height
+    const previewHeight = 100; // Adjust based on preview bar height
     const availableHeight = windowHeight - previewHeight - 50; // Include padding/margins
-
+  
     const imgElement = new Image();
-    imgElement.src = image.url;
+    imgElement.src = images[index].url;
     imgElement.onload = () => {
-        if (imgElement.height > availableHeight) {
-            imgElement.style.height = `${availableHeight}px`;
-            imgElement.style.width = 'auto';
-        }
-    };
-
-    modalContent.innerHTML = `
+      const imgWidth = imgElement.width;
+      const imgHeight = imgElement.height;
+  
+      // Calculate aspect ratio and resize if necessary
+      const aspectRatio = imgWidth / imgHeight;
+      let resizedWidth = imgWidth;
+      let resizedHeight = imgHeight;
+      if (imgHeight > availableHeight) {
+        resizedHeight = availableHeight;
+        resizedWidth = aspectRatio * resizedHeight;
+      }
+  
+      modalContent.innerHTML = `
         <div style="text-align: center;">
-            <img src="${image.url}" class="modal-file" alt="Image" style="max-height: ${availableHeight}px;">
+          <img src="${images[index].url}" class="modal-file" style="max-width: ${resizedWidth}px; max-height: ${resizedHeight}px;">
         </div>
         <div class="image-previews mt-3">
-            ${getPreviewThumbnails(index, images)}
+          ${getPreviewThumbnails(index, images)}
         </div>
-    `;
-}
+      `;
+    };
+  }
 
 function getPreviewThumbnails(index, images) {
     const previews = [];
