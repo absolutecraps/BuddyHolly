@@ -110,9 +110,13 @@ function clearContent(elementIds) {
 }
 
 // Helper functions for creating list items
+// Ensure subfolder links are not affected by modal/gallery logic
 function createSubfolderListItem(folder, subfolder) {
     const listItem = document.createElement('li');
-    listItem.innerHTML = `<a href="subfolder.html?folder=${subfolder}/${folder}">${folder}</a>`;
+    const link = document.createElement('a');
+    link.href = `subfolder.html?folder=${subfolder}/${folder}`;
+    link.textContent = folder;
+    listItem.appendChild(link);
     return listItem;
 }
 
@@ -121,6 +125,7 @@ function createMiscListItem(file) {
     listItem.innerHTML = `<a href="${file.url}">${file.name}</a>`;
     return listItem;
 }
+// Update loadSubfolderContents to include the new gallery initialization
 async function loadSubfolderContents(subfolder) {
     try {
         console.log("Fetching subfolder contents...");
@@ -133,61 +138,29 @@ async function loadSubfolderContents(subfolder) {
         const data = await response.json();
         console.log("Subfolder contents fetched:", data);
 
-        // Update subfolder name element
         document.getElementById('subfolderName').textContent = subfolder;
 
-        // Clear existing content more efficiently
         clearContent(['foldersList', 'videosList', 'imagesList', 'miscList']);
 
-        // Folders section
         const foldersList = document.getElementById('foldersList');
-        let hasSubfolders = false;
-        data.folders.forEach(folder => {
-            if (folder !== "thumbnail" && folder !== "tn") {
-                const listItem = createSubfolderListItem(folder, subfolder);
-                foldersList.appendChild(listItem);
-                hasSubfolders = true;
-            }
+        data.folders.forEach((folder) => {
+            const listItem = createSubfolderListItem(folder, subfolder);
+            foldersList.appendChild(listItem);
         });
-        if (hasSubfolders) {
-            document.getElementById('foldersSection').style.display = 'block';
-        }
 
-        // Videos section
-        const videosList = document.getElementById('videosList');
-        if (data.videos.length > 0) {
-            data.videos.forEach((video, index) => {
-                const videoItem = createVideoItem(video, index);
-                videosList.appendChild(videoItem);
-            });
-            document.getElementById('videosSection').style.display = 'block';
-        }
-
-        // Images section
         const imagesList = document.getElementById('imagesList');
-        const validImages = data.images.filter(image => !image.url.includes('mp4')).sort((a, b) => a.url.localeCompare(b.url));
-        if (validImages.length > 0) {
-            validImages.forEach((image, index) => {
-                const imageItem = createImageItem(image, index);
-                imagesList.appendChild(imageItem);
-            });
-            document.getElementById('imagesSection').style.display = 'block';
-        }
+        data.images.forEach((image, index) => {
+            const imageItem = createImageItem(image, index);
+            imagesList.appendChild(imageItem);
+        });
 
-        // Misc section
-        const miscList = document.getElementById('miscList');
-        if (data.misc.length > 0) {
-            data.misc.forEach(file => {
-                const listItem = createMiscListItem(file);
-                miscList.appendChild(listItem);
-            });
-            document.getElementById('miscSection').style.display = 'block';
-        }
+        const videosList = document.getElementById('videosList');
+        data.videos.forEach((video, index) => {
+            const videoItem = createVideoItem(video, index);
+            videosList.appendChild(videoItem);
+        });
 
-        console.log("Subfolder contents populated successfully");
-
-        // Initialize Photoswipe
-        initPhotoSwipeFromDOM('.container');
+        initPhotoSwipeFromDOM('#imagesSection, #videosSection');
     } catch (error) {
         console.error("Error fetching subfolder contents:", error);
     }
@@ -244,18 +217,18 @@ function createImageItem(image, index) {
 }
 
 function initPhotoSwipeFromDOM(gallerySelector) {
-    const parseThumbnailElements = function(el) {
+    const parseThumbnailElements = function (el) {
         const items = [];
         const thumbElements = el.querySelectorAll('a[data-type="image"], img[data-type="video"]');
 
-        thumbElements.forEach((el, index) => {
+        thumbElements.forEach((el) => {
             const item = {
                 src: el.href || el.src,
-                w: el.naturalWidth || 800, // default width
-                h: el.naturalHeight || 600, // default height
+                w: el.naturalWidth || 800,
+                h: el.naturalHeight || 600,
                 title: el.alt || '',
                 msrc: el.querySelector('img') ? el.querySelector('img').src : el.src,
-                el: el
+                el: el,
             };
 
             if (el.dataset.type === 'video') {
@@ -273,7 +246,7 @@ function initPhotoSwipeFromDOM(gallerySelector) {
         return items;
     };
 
-    const openPhotoSwipe = function(index, galleryElement, disableAnimation, fromURL) {
+    const openPhotoSwipe = function (index, galleryElement) {
         const pswpElement = document.querySelectorAll('.pswp')[0];
         const items = parseThumbnailElements(galleryElement);
         if (items.length === 0) {
@@ -291,10 +264,9 @@ function initPhotoSwipeFromDOM(gallerySelector) {
                 const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
                 const rect = thumbnail.getBoundingClientRect();
                 return { x: rect.left, y: rect.top + pageYScroll, w: rect.width };
-            }
+            },
         };
 
-        // Pass data to PhotoSwipe and initialize it
         const gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
         gallery.init();
     };
@@ -303,14 +275,19 @@ function initPhotoSwipeFromDOM(gallerySelector) {
 
     galleryElements.forEach((galleryElement, galleryIndex) => {
         galleryElement.setAttribute('data-pswp-uid', galleryIndex + 1);
-        galleryElement.addEventListener('click', function(e) {
-            if (e.target.tagName === 'IMG' || e.target.tagName === 'A') {
+
+        galleryElement.querySelectorAll('img[data-type="video"]').forEach((img) => {
+            img.addEventListener('click', (e) => {
                 e.preventDefault();
-                const index = parseInt(e.target.dataset.index, 10);
-                const type = e.target.dataset.type;
-                console.log(`Opening ${type} with index: ${index}`);
-                openPhotoSwipe(index, galleryElement);
-            }
+                openPhotoSwipe(parseInt(img.dataset.index, 10), galleryElement);
+            });
+        });
+
+        galleryElement.querySelectorAll('a[data-type="image"]').forEach((a) => {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                openPhotoSwipe(parseInt(a.dataset.index, 10), galleryElement);
+            });
         });
     });
 }

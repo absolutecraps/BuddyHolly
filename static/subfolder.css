@@ -10,9 +10,16 @@
     display: block;
     margin: 0 auto;
     max-width: 100%;
-    max-height: calc(100vh - 100px); /* Ensure modal content fits within the browser window */
-    width: auto; /* Ensure images keep their original aspect ratio */
-    height: auto; /* Ensure images keep their original aspect ratio */
+    max-height: calc(100vh - 150px); /* Adjust for padding/margins */
+    object-fit: contain; /* Maintain aspect ratio */
+    width: auto;
+    height: auto;
+}
+
+.modal-content {
+    max-width: 100%;
+    max-height: calc(100vh - 100px); /* Adjust for modal padding */
+    object-fit: contain; /* Maintain aspect ratio and fit within container */
 }
 
 .modal-dialog-centered {
@@ -104,7 +111,7 @@
 
 .modal-content {
     max-width: 100%;
-    max-height: 100%;
+    max-height: calc(100vh - 100px); /* Adjust for modal padding */
     object-fit: contain; /* Maintain aspect ratio and fit within container */
 }
 
