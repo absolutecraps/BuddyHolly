@@ -109,16 +109,17 @@ function clearContent(elementIds) {
     });
 }
 
-// Helper functions for creating list items
-// Ensure subfolder links are not affected by modal/gallery logic
 function createSubfolderListItem(folder, subfolder) {
     const listItem = document.createElement('li');
     const link = document.createElement('a');
     link.href = `subfolder.html?folder=${subfolder}/${folder}`;
     link.textContent = folder;
+    link.dataset.type = 'folder'; // Mark as folder to exclude from modal
     listItem.appendChild(link);
     return listItem;
 }
+
+
 
 function createMiscListItem(file) {
     const listItem = document.createElement('li');
@@ -238,14 +239,15 @@ function initPhotoSwipeFromDOM(gallerySelector) {
             if (el.dataset.type === 'video') {
                 item.html = `
                     <div style="text-align: center;">
-                        <video controls style="width:100%; height:auto;">
+                        <video id="videoElement-${index}" style="width:100%; height:auto;">
                             <source src="${el.src}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
-                        <button id="playButton" class="btn btn-primary mt-3">Play Video</button>
+                        <button id="playButton-${index}" class="btn btn-primary mt-3">Play Video</button>
                     </div>
                 `;
             }
+            
 
             items.push(item);
         });
@@ -274,7 +276,22 @@ function initPhotoSwipeFromDOM(gallerySelector) {
         };
 
         const gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
+
+        gallery.listen('afterChange', function () {
+            const currentIndex = gallery.getCurrentIndex();
+            const currentItem = items[currentIndex];
+            const playButton = document.getElementById(`playButton-${currentIndex}`);
+            const videoElement = document.getElementById(`videoElement-${currentIndex}`);
+
+            if (playButton && videoElement) {
+                playButton.addEventListener('click', () => {
+                    videoElement.play();
+                });
+            }
+        });
+
         gallery.init();
+
     };
 
     const galleryElements = document.querySelectorAll(gallerySelector);
