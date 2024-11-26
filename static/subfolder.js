@@ -100,6 +100,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+function clearContent(elementIds) {
+    elementIds.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.innerHTML = '';
+      }
+    });
+  }
+
 async function loadSubfolderContents(subfolder) {
     try {
       console.log("Fetching subfolder contents...");
