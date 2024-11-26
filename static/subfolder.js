@@ -100,6 +100,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("Loading subfolder page...");
+    await loadNavbar();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const subfolder = urlParams.get('folder');
+    if (subfolder) {
+        console.log(`Subfolder parameter found: ${subfolder}`);
+        await loadSubfolderContents(subfolder);
+    } else {
+        console.error('No subfolder specified in the URL');
+    }
+});
+
 async function loadSubfolderContents(subfolder) {
     try {
         console.log("Fetching subfolder contents...");
@@ -214,7 +228,7 @@ function initPhotoSwipeFromDOM(gallerySelector) {
                 w: el.naturalWidth || 800, // default width
                 h: el.naturalHeight || 600, // default height
                 title: el.alt || '',
-                msrc: el.querySelector('img').src,
+                msrc: el.querySelector('img') ? el.querySelector('img').src : el.src,
                 el: el
             };
 
@@ -238,7 +252,13 @@ function initPhotoSwipeFromDOM(gallerySelector) {
         const items = parseThumbnailElements(galleryElement);
         const options = {
             galleryUID: galleryElement.getAttribute('data-pswp-uid'),
-            index: index
+            index: index,
+            getThumbBoundsFn: (index) => {
+                const thumbnail = items[index].el;
+                const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
+                const rect = thumbnail.getBoundingClientRect();
+                return { x: rect.left, y: rect.top + pageYScroll, w: rect.width };
+            }
         };
 
         // Pass data to PhotoSwipe and initialize it
