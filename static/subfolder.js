@@ -109,84 +109,97 @@ function clearContent(elementIds) {
     });
   }
 
+// Function to initialize gallery elements
+function initializeGallery(gallerySelector) {
+    const galleryElements = document.querySelectorAll(gallerySelector);
+
+    galleryElements.forEach((galleryElement, galleryIndex) => {
+        galleryElement.setAttribute('data-pswp-uid', galleryIndex + 1);
+        galleryElement.addEventListener('click', function (e) {
+            if (e.target.tagName === 'IMG' || e.target.tagName === 'A') {
+                e.preventDefault();
+                openPhotoSwipe(parseInt(e.target.dataset.index, 10), galleryElement);
+            }
+        });
+    });
+
+    console.log("Gallery initialized for selector:", gallerySelector);
+}
+
+// Updated loadSubfolderContents function
 async function loadSubfolderContents(subfolder) {
     try {
-      console.log("Fetching subfolder contents...");
-      const response = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${subfolder}`);
-  
-      if (!response.ok) {
-        console.error("Failed to fetch subfolder contents:", response.status, response.statusText);
-        return;
-      }
-  
-      const data = await response.json();
-      console.log("Subfolder contents fetched:", data);
-  
-      // Update subfolder name element
-      document.getElementById('subfolderName').textContent = subfolder;
-  
-      // Clear existing content more efficiently
-      clearContent(['foldersList', 'videosList', 'imagesList', 'miscList']);
-  
-      // Folders section
-      const foldersList = document.getElementById('foldersList');
-      let hasSubfolders = false;
-      data.folders.forEach(folder => {
-        if (folder !== "thumbnail" && folder !== "tn") {
-          const listItem = createSubfolderListItem(folder, subfolder);
-          foldersList.appendChild(listItem);
-          hasSubfolders = true;
+        console.log("Fetching subfolder contents...");
+        const response = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${subfolder}`);
+
+        if (!response.ok) {
+            console.error("Failed to fetch subfolder contents:", response.status, response.statusText);
+            return;
         }
-      });
-      if (hasSubfolders) {
-        document.getElementById('foldersSection').style.display = 'block';
-      }
-  
-      // Videos section
-      const videosList = document.getElementById('videosList');
-      if (data.videos.length > 0) {
-        data.videos.forEach((video, index) => {
-          const videoItem = createVideoItem(video, index);
-          videosList.appendChild(videoItem);
+
+        const data = await response.json();
+        console.log("Subfolder contents fetched:", data);
+
+        // Update subfolder name element
+        document.getElementById('subfolderName').textContent = subfolder;
+
+        // Clear existing content more efficiently
+        clearContent(['foldersList', 'videosList', 'imagesList', 'miscList']);
+
+        // Folders section
+        const foldersList = document.getElementById('foldersList');
+        let hasSubfolders = false;
+        data.folders.forEach(folder => {
+            if (folder !== "thumbnail" && folder !== "tn") {
+                const listItem = createSubfolderListItem(folder, subfolder);
+                foldersList.appendChild(listItem);
+                hasSubfolders = true;
+            }
         });
-        document.getElementById('videosSection').style.display = 'block';
-      }
-  
-      // Images section
-      const imagesList = document.getElementById('imagesList');
-      const validImages = data.images.filter(image => !image.url.includes('mp4')).sort((a, b) => a.url.localeCompare(b.url));
-      if (validImages.length > 0) {
-        validImages.forEach((image, index) => {
-          const imageItem = createImageItem(image, index, imagesList);
-          imagesList.appendChild(imageItem);
-        });
-        document.getElementById('imagesSection').style.display = 'block';
-      }  
-      // Misc section
-      const miscList = document.getElementById('miscList');
-      if (data.misc.length > 0) {
-        data.misc.forEach(file => {
-          const listItem = createMiscListItem(file);
-          miscList.appendChild(listItem);
-        });
-        document.getElementById('miscSection').style.display = 'block';
-      }
-  
-      console.log("Subfolder contents populated successfully");
-  
-      // Initialize Photoswipe
-      initPhotoSwipeFromDOM('.container');
+        if (hasSubfolders) {
+            document.getElementById('foldersSection').style.display = 'block';
+        }
+
+        // Videos section
+        const videosList = document.getElementById('videosList');
+        if (data.videos.length > 0) {
+            data.videos.forEach((video, index) => {
+                const videoItem = createVideoItem(video, index);
+                videosList.appendChild(videoItem);
+            });
+            document.getElementById('videosSection').style.display = 'block';
+        }
+
+        // Images section
+        const imagesList = document.getElementById('imagesList');
+        const validImages = data.images.filter(image => !image.url.includes('mp4')).sort((a, b) => a.url.localeCompare(b.url));
+        if (validImages.length > 0) {
+            validImages.forEach((image, index) => {
+                const imageItem = createImageItem(image, index);
+                imagesList.appendChild(imageItem);
+            });
+            document.getElementById('imagesSection').style.display = 'block';
+        }
+
+        // Misc section
+        const miscList = document.getElementById('miscList');
+        if (data.misc.length > 0) {
+            data.misc.forEach(file => {
+                const listItem = createMiscListItem(file);
+                miscList.appendChild(listItem);
+            });
+            document.getElementById('miscSection').style.display = 'block';
+        }
+
+        console.log("Subfolder contents populated successfully");
+
+        // Initialize the gallery after dynamically loading content
+        initializeGallery('.container'); // Use appropriate selector for the gallery elements
     } catch (error) {
-      console.error("Error fetching subfolder contents:", error);
+        console.error("Error fetching subfolder contents:", error);
     }
-  }
-  
-  // Helper functions for creating list items
-  function createSubfolderListItem(folder, subfolder) {
-    const listItem = document.createElement('li');
-    listItem.innerHTML = `<a href="subfolder.html?folder=<span class="math-inline">\{subfolder\}/</span>{folder}">${folder}</a>`;
-    return listItem;
-  }
+}
+
   
   function createVideoItem(video, index) {
     const col = document.createElement('div');
@@ -239,16 +252,3 @@ async function loadSubfolderContents(subfolder) {
   
     return col;
   }
-
-    const galleryElements = document.querySelectorAll(gallerySelector);
-
-    galleryElements.forEach((galleryElement, galleryIndex) => {
-        galleryElement.setAttribute('data-pswp-uid', galleryIndex + 1);
-        galleryElement.addEventListener('click', function(e) {
-            if (e.target.tagName === 'IMG' || e.target.tagName === 'A') {
-                e.preventDefault();
-                openPhotoSwipe(parseInt(e.target.dataset.index, 10), galleryElement);
-            }
-        });
-    });
-}
