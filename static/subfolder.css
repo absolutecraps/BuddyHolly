@@ -46,59 +46,6 @@
     overflow: hidden;
 }
 
-
 .image-previews img:hover {
     transform: scale(1.2);
 }
-
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.8);
-  }
-  
-  
-  .caption {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  
-  .image-previews {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-  }
-  
-  .image-previews img {
-    width: 50px;
-    height: 50px;
-    margin: 0 5px;
-    cursor: pointer;
-  }
-  
-  .close {
-    position: absolute;
-    top: 25px;
-    right: 25px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #fff;
-    cursor: pointer;
-  }
-
-  .modal-content {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* Maintain aspect ratio and fit within container */
-  }
-  
-  .modal-content.zoomed {
-    object-fit: fill; /* Fill the container, potentially stretching the image */
-  }

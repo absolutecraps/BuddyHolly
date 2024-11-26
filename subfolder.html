@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subfolder Contents</title>
     <link href="static/bootstrap.min.css" rel="stylesheet"> <!-- Use local Bootstrap CSS file -->
-    
-<link rel="stylesheet" href="static/subfolder.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css"> <!-- Fancybox CSS -->
+    <link rel="stylesheet" href="static/subfolder.css">
 </head>
 <body>
     <div id="navbar"></div> <!-- Navbar will be dynamically loaded here -->
@@ -36,14 +36,7 @@
         </div>
     </div>
 
-    <!-- Modal for viewing images and videos -->
-        <div id="image-modal" class="modal">
-            <span class="close">&times;</span>
-            <img class="modal-content" id="modal-image">
-            <div class="caption"></div>
-            <div 1  class="image-previews"></div>
-        </div>
-    </div>    
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script> <!-- Fancybox JS -->
     <script src="static/bootstrap.bundle.min.js"></script> <!-- Use local Bootstrap JS file -->
     <script src="static/subfolder.js"></script>
 </body>

@@ -128,9 +128,9 @@ async function loadSubfolderContents(subfolder) {
                 img.src = fullThumbnailUrl;
                 img.className = 'img-thumbnail file-thumbnail';
                 img.alt = imgName;
-                img.onerror = () => { // Handle missing thumbnails
+                img.onerror = () => {
                     console.error(`Thumbnail not found: ${fullThumbnailUrl}`);
-                    img.src = video.thumbnail_url; // Fall back to original thumbnail if full thumbnail is missing
+                    img.src = video.thumbnail_url;
                 };
                 img.dataset.bsToggle = 'modal';
                 img.dataset.bsTarget = '#fileModal';
@@ -162,23 +162,24 @@ async function loadSubfolderContents(subfolder) {
                 const col = document.createElement('div');
                 col.className = 'col-md-4';
 
-                // Use thumbnail for display
                 const imgName = image.url.split('/').pop();
                 const thumbnailUrl = `${image.url.split('/').slice(0, -1).join('/')}/thumbnail/${imgName.replace('.jpg', '_tn.jpg')}`;
-                
+
+                const a = document.createElement('a');
+                a.href = image.url;
+                a.dataset.fancybox = 'gallery';
+
                 const img = document.createElement('img');
                 img.src = thumbnailUrl;
                 img.className = 'img-thumbnail file-thumbnail';
-                img.alt = imgName; // Add alt attribute for accessibility
-                img.onerror = () => { // Handle missing thumbnails
+                img.alt = imgName;
+                img.onerror = () => {
                     console.error(`Thumbnail not found: ${thumbnailUrl}`);
-                    img.src = image.url; // Fall back to full image if thumbnail is missing
+                    img.src = image.url;
                 };
-                img.dataset.bsToggle = 'modal';
-                img.dataset.bsTarget = '#fileModal';
-                img.dataset.index = index;
-                img.addEventListener('click', () => openImageModal(index, validImages));
-                col.appendChild(img);
+
+                a.appendChild(img);
+                col.appendChild(a);
                 imagesList.appendChild(col);
             });
             document.getElementById('imagesSection').style.display = 'block';
@@ -201,66 +202,6 @@ async function loadSubfolderContents(subfolder) {
     }
 }
 
-function openImageModal(index, images) {
-    const modal = document.getElementById('image-modal');
-    const modalImage = document.getElementById('modal-image');
-    const caption = document.querySelector('.caption');
-    const previews = document.querySelector('.image-previews');
-  
-    // Set the image source and caption
-    modalImage.src = images[index].url;
-    caption.textContent = images[index].name;
-  
-    // Populate the preview bar
-    previews.innerHTML = getPreviewThumbnails(index, images);
-  
-    // Show the modal
-    modal.style.display = 'block';
-  
-    // Add event listener for closing the modal
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
-  
-    // Add event listener for zooming the image
-    modalImage.addEventListener('click', () => {
-      modalImage.classList.toggle('zoomed');
-    });
-  }
-
-  function getPreviewThumbnails(index, images) {
-    const previews = [];
-    const start = Math.max(0, index - 5);
-    const end = Math.min(images.length, index + 6);
-    for (let i = start; i < end; i++) {
-      if (i !== index) {
-        previews.push(`
-          <img src="${images[i].thumbnail_url}" class="preview-thumbnail" alt="Preview Image" onclick="openImageModal(${i}, images)">
-        `);
-      }
-    }
-    return previews.join('');
-  }
-
-
-function addZoomFunctionality() {
-    const modalFile = document.querySelector('.modal-file');
-    let scale = 1;
-    modalFile.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        if (e.deltaY > 0) {
-            scale += 0.1;
-        } else {
-            scale -= 0.1;
-        }
-        scale = Math.min(Math.max(0.5, scale), 3); // Limit zoom to between 0.5x and 3x
-        modalFile.style.transform = `scale(${scale})`;
-        modalFile.style.transformOrigin = 'center'; // Ensure zoom happens from the center
-    });
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Loading subfolder page...");
     await loadNavbar();
@@ -273,4 +214,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         console.error('No subfolder specified in the URL');
     }
+
+    // Initialize Fancybox
+    Fancybox.bind('[data-fancybox="gallery"]', {
+        Thumbs: {
+            autoStart: true,
+        },
+        Toolbar: {
+            display: ["close"]
+        }
+    });
 });
