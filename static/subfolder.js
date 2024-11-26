@@ -85,7 +85,6 @@ async function populateNavbarFolders() {
         console.error("Error fetching folders for navbar:", error);
     }
 }
-
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Loading subfolder page...");
     await loadNavbar();
@@ -102,156 +101,196 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function clearContent(elementIds) {
     elementIds.forEach(id => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.innerHTML = '';
-      }
+        const element = document.getElementById(id);
+        if (element) {
+            element.innerHTML = '';
+        }
     });
-  }
+}
+async function loadSubfolderContents(subfolder) {
+    try {
+        console.log("Fetching subfolder contents...");
+        const response = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${subfolder}`);
+        if (!response.ok) {
+            console.error("Failed to fetch subfolder contents:", response.status, response.statusText);
+            return;
+        }
 
-// Function to initialize gallery elements
-function initializeGallery(gallerySelector) {
+        const data = await response.json();
+        console.log("Subfolder contents fetched:", data);
+
+        // Update subfolder name element
+        document.getElementById('subfolderName').textContent = subfolder;
+
+        // Clear existing content more efficiently
+        clearContent(['foldersList', 'videosList', 'imagesList', 'miscList']);
+
+        // Folders section
+        const foldersList = document.getElementById('foldersList');
+        let hasSubfolders = false;
+        data.folders.forEach(folder => {
+            if (folder !== "thumbnail" && folder !== "tn") {
+                const listItem = createSubfolderListItem(folder, subfolder);
+                foldersList.appendChild(listItem);
+                hasSubfolders = true;
+            }
+        });
+        if (hasSubfolders) {
+            document.getElementById('foldersSection').style.display = 'block';
+        }
+
+        // Videos section
+        const videosList = document.getElementById('videosList');
+        if (data.videos.length > 0) {
+            data.videos.forEach((video, index) => {
+                const videoItem = createVideoItem(video, index);
+                videosList.appendChild(videoItem);
+            });
+            document.getElementById('videosSection').style.display = 'block';
+        }
+
+        // Images section
+        const imagesList = document.getElementById('imagesList');
+        const validImages = data.images.filter(image => !image.url.includes('mp4')).sort((a, b) => a.url.localeCompare(b.url));
+        if (validImages.length > 0) {
+            validImages.forEach((image, index) => {
+                const imageItem = createImageItem(image, index);
+                imagesList.appendChild(imageItem);
+            });
+            document.getElementById('imagesSection').style.display = 'block';
+        }
+
+        // Misc section
+        const miscList = document.getElementById('miscList');
+        if (data.misc.length > 0) {
+            data.misc.forEach(file => {
+                const listItem = createMiscListItem(file);
+                miscList.appendChild(listItem);
+            });
+            document.getElementById('miscSection').style.display = 'block';
+        }
+
+        console.log("Subfolder contents populated successfully");
+
+        // Initialize Photoswipe
+        initPhotoSwipeFromDOM('.container');
+    } catch (error) {
+        console.error("Error fetching subfolder contents:", error);
+    }
+}
+function createVideoItem(video, index) {
+    const col = document.createElement('div');
+    col.className = 'col-md-4';
+
+    const imgName = video.thumbnail_url.split('/').pop();
+    const fullThumbnailUrl = video.thumbnail_url.replace('_tn', '.jpg');
+
+    const img = document.createElement('img');
+    img.src = fullThumbnailUrl;
+    img.className = 'img-thumbnail file-thumbnail';
+    img.alt = imgName;
+    img.onerror = () => {
+        console.error(`Thumbnail not found: ${fullThumbnailUrl}`);
+        img.src = video.thumbnail_url;
+    };
+    img.dataset.index = index;
+    img.dataset.type = 'video';
+
+    col.appendChild(img);
+    return col;
+}
+
+function createImageItem(image, index, gallerySelector) {
+    const col = document.createElement('div');
+    col.className = 'col-md-4';
+
+    const imgName = image.url.split('/').pop();
+    const thumbnailUrl = `${image.url.split('/').slice(0, -1).join('/')}/thumbnail/${imgName.replace('.jpg', '_tn.jpg')}`;
+
+    const a = document.createElement('a');
+    a.href = image.url;
+    a.dataset.type = 'image';
+    a.dataset.index = index;
+
+    const img = document.createElement('img');
+    img.src = thumbnailUrl;
+    img.className = 'img-thumbnail file-thumbnail';
+    img.alt = imgName;
+    img.onerror = () => {
+        console.error(`Thumbnail not found: ${thumbnailUrl}`);
+        img.src = image.url;
+    };
+
+    a.appendChild(img);
+    col.appendChild(a);
+
+    return col;
+}
+function initPhotoSwipeFromDOM(gallerySelector) {
+    const parseThumbnailElements = function(el) {
+        const items = [];
+        const thumbElements = el.querySelectorAll('a[data-type="image"], img[data-type="video"]');
+
+        thumbElements.forEach((el, index) => {
+            const item = {
+                src: el.href || el.src,
+                w: el.naturalWidth || 800, // default width
+                h: el.naturalHeight || 600, // default height
+                title: el.alt || '',
+                msrc: el.querySelector('img') ? el.querySelector('img').src : el.src,
+                el: el
+            };
+
+            if (el.dataset.type === 'video') {
+                item.html = `
+                    <video controls style="width:100%; height:100%;">
+                        <source src="${el.src}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `;
+            }
+
+            items.push(item);
+        });
+
+        return items;
+    };
+
+    const openPhotoSwipe = function(index, galleryElement, disableAnimation, fromURL) {
+        const pswpElement = document.querySelectorAll('.pswp')[0];
+        const items = parseThumbnailElements(galleryElement);
+        if (items.length === 0) {
+            console.error("No items to display in PhotoSwipe");
+            return;
+        }
+        const options = {
+            galleryUID: galleryElement.getAttribute('data-pswp-uid'),
+            index: index,
+            getThumbBoundsFn: (index) => {
+                const thumbnail = items[index] ? items[index].el : null;
+                if (!thumbnail) {
+                    return { x: 0, y: 0, w: 0 };
+                }
+                const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
+                const rect = thumbnail.getBoundingClientRect();
+                return { x: rect.left, y: rect.top + pageYScroll, w: rect.width };
+            }
+        };
+
+        // Pass data to PhotoSwipe and initialize it
+        const gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, options);
+        gallery.init();
+    };
+
     const galleryElements = document.querySelectorAll(gallerySelector);
 
     galleryElements.forEach((galleryElement, galleryIndex) => {
         galleryElement.setAttribute('data-pswp-uid', galleryIndex + 1);
-        galleryElement.addEventListener('click', function (e) {
+        galleryElement.addEventListener('click', function(e) {
             if (e.target.tagName === 'IMG' || e.target.tagName === 'A') {
                 e.preventDefault();
                 openPhotoSwipe(parseInt(e.target.dataset.index, 10), galleryElement);
             }
         });
     });
-
-    console.log("Gallery initialized for selector:", gallerySelector);
 }
-
-// Updated loadSubfolderContents function
-async function loadSubfolderContents(subfolder) {
-    try {
-      console.log("Fetching subfolder contents...");
-      const response = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${subfolder}`);
-  
-      if (!response.ok) {
-        console.error("Failed to fetch subfolder contents:", response.status, response.statusText);
-        return;
-      }
-  
-      const data = await response.json();
-      console.log("Subfolder contents fetched:", data);
-  
-      // Update subfolder name element
-      document.getElementById('subfolderName').textContent = subfolder;
-  
-      // Clear existing content more efficiently
-      clearContent(['foldersList', 'videosList', 'imagesList', 'miscList']);
-  
-      // Folders section
-      const foldersList = document.getElementById('foldersList');
-      let hasSubfolders = false;
-      data.folders.forEach(folder => {
-        if (folder !== "thumbnail" && folder !== "tn") {
-          const listItem = createSubfolderListItem(folder, subfolder);
-          foldersList.appendChild(listItem);
-          hasSubfolders = true;
-        }
-      });
-      if (hasSubfolders) {
-        document.getElementById('foldersSection').style.display = 'block';
-      }
-  
-      // Videos section
-      const videosList = document.getElementById('videosList');
-      if (data.videos.length > 0) {
-        data.videos.forEach((video, index) => {
-          const videoItem = createVideoItem(video, index);
-          videosList.appendChild(videoItem);
-        });
-        document.getElementById('videosSection').style.display = 'block';
-  
-        // Initialize PhotoSwipe for videos
-        initPhotoSwipeFromDOM('#videosList');
-      }
-  
-      // Images section
-      const imagesList = document.getElementById('imagesList');
-      const validImages = data.images.filter(image => !image.url.includes('mp4')).sort((a, b) => a.url.localeCompare(b.url));
-      if (validImages.length > 0) {
-        validImages.forEach((image, index) => {
-          const imageItem = createImageItem(image, index);
-          imagesList.appendChild(imageItem);
-        });
-        document.getElementById('imagesSection').style.display = 'block';
-  
-        // Initialize PhotoSwipe for images
-        initPhotoSwipeFromDOM('#imagesList');
-      }
-  
-      // Misc section
-      const miscList = document.getElementById('miscList');
-      if (data.misc.length > 0) {
-        data.misc.forEach(file => {
-          const listItem = createMiscListItem(file);
-          miscList.appendChild(listItem);
-        });
-        document.getElementById('miscSection').style.display = 'block';
-      }
-  
-      console.log("Subfolder contents populated successfully");
-    } catch (error) {
-      console.error("Error fetching subfolder contents:", error);
-    }
-  }
-
-  
-  function createVideoItem(video, index) {
-    const col = document.createElement('div');
-    col.className = 'col-md-4';
-  
-    const imgName = video.thumbnail_url.split('/').pop();
-    const fullThumbnailUrl = video.thumbnail_url.replace('_tn', '.jpg');
-  
-    const img = document.createElement('img');
-    img.src = fullThumbnailUrl;
-    img.className = 'img-thumbnail file-thumbnail';
-    img.alt = imgName;
-    img.onerror = () => {
-      console.error(`Thumbnail not found: ${fullThumbnailUrl}`);
-      img.src = video.thumbnail_url;
-    };
-    img.dataset.index = index;
-    img.dataset.type = 'video';
-  
-    col.appendChild(img);
-    return col;
-  }
-  
-  function createImageItem(image, index, gallerySelector) {
-    const col = document.createElement('div');
-    col.className = 'col-md-4';
-  
-    const imgName = image.url.split('/').pop();
-    const thumbnailUrl = `${image.url.split('/').slice(0, -1).join('/')}/thumbnail/${imgName.replace('.jpg', '_tn.jpg')}`;
-  
-    const a = document.createElement('a');
-    a.href = image.url;
-    a.dataset.type = 'image';
-    a.dataset.index = index;
-  
-    const img = document.createElement('img');
-    img.src = thumbnailUrl;
-    img.className = 'img-thumbnail file-thumbnail';
-    img.alt = imgName;
-    img.onerror = () => {
-      console.error(`Thumbnail not found: ${thumbnailUrl}`);
-      img.src = image.url;
-    };
-  
-    a.appendChild(img);
-    col.appendChild(a);
-  
-    // Initialize PhotoSwipe for this image
-    initPhotoSwipeFromDOM(gallerySelector, a);
-  
-    return col;
-  }
