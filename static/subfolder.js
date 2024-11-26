@@ -85,6 +85,7 @@ async function populateNavbarFolders() {
         console.error("Error fetching folders for navbar:", error);
     }
 }
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Loading subfolder page...");
     await loadNavbar();
@@ -207,6 +208,7 @@ async function loadSubfolderContents(subfolder) {
         console.error("Error fetching subfolder contents:", error);
     }
 }
+
 function initPhotoSwipeFromDOM(gallerySelector) {
     const parseThumbnailElements = function(el) {
         const items = [];
