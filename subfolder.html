@@ -37,13 +37,11 @@
     </div>
 
     <!-- Modal for viewing images and videos -->
-    <div class="modal fade" id="fileModal" tabindex="-1" aria-labelledby="fileModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div id="modalContent"></div>
-                </div>
-            </div>
+        <div id="image-modal" class="modal">
+            <span class="close">&times;</span>
+            <img class="modal-content" id="modal-image">
+            <div class="caption"></div>
+            <div 1  class="image-previews"></div>
         </div>
     </div>    
     <script src="static/bootstrap.bundle.min.js"></script> <!-- Use local Bootstrap JS file -->

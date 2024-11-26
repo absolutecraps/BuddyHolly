@@ -202,68 +202,44 @@ async function loadSubfolderContents(subfolder) {
 }
 
 function openImageModal(index, images) {
-    const modalContent = document.getElementById('modalContent');
-    const modalDialog = document.querySelector('.modal-dialog');
-    modalDialog.classList.add('modal-dialog-centered');
+    const modal = document.getElementById('image-modal');
+    const modalImage = document.getElementById('modal-image');
+    const caption = document.querySelector('.caption');
+    const previews = document.querySelector('.image-previews');
   
-    const image = images[index];
+    // Set the image source and caption
+    modalImage.src = images[index].url;
+    caption.textContent = images[index].name;
   
-    // Determine the file type based on the URL extension
-    const fileExtension = image.url.split('.').pop().toLowerCase();
+    // Populate the preview bar
+    previews.innerHTML = getPreviewThumbnails(index, images);
   
-    if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png' || fileExtension === 'gif') {
-      // Image file
-      modalContent.innerHTML = `
-        <div style="text-align: center;">
-          <img src="${image.url}" class="modal-file" alt="Image">
-        </div>
-        <div class="image-previews mt-3">
-          ${getPreviewThumbnails(index, images)}
-        </div>
-      `;
+    // Show the modal
+    modal.style.display = 'block';
   
-      const imgElement = modalContent.querySelector('img');
-      imgElement.onload = () => {
-        const imgWidth = imgElement.width;
-        const imgHeight = imgElement.height;
+    // Add event listener for closing the modal
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
   
-        // Calculate aspect ratio and resize if necessary
-        const aspectRatio = imgWidth / imgHeight;
-        let resizedWidth = imgWidth;
-        let resizedHeight = imgHeight;
-        if (imgHeight > availableHeight) {
-          resizedHeight = availableHeight;
-          resizedWidth = aspectRatio * resizedHeight;
-        }
+    // Add event listener for zooming the image
+    modalImage.addEventListener('click', () => {
+      if (modalImage.style.transform === 'scale(2)') {
+        modalImage.style.transform = 'scale(1)';
+      } else {
+        modalImage.style.transform = 'scale(2)';
+      }
+    });
   
-        imgElement.style.maxWidth = `${resizedWidth}px`;
-        imgElement.style.maxHeight = `${resizedHeight}px`;
-  
-        let zoomLevel = 1;
-  
-        imgElement.addEventListener('click', () => {
-          zoomLevel = zoomLevel === 1 ? 2 : 1;
-          imgElement.style.transform = `scale(${zoomLevel})`;
-        });
-      };
-    } else if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension === 'avi') {
-      // Video file
-      modalContent.innerHTML = `
-        <video controls class="modal-file">
-          <source src="${image.url}" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-      `;
-    } else {
-      // Handle other file types or errors
-      modalContent.innerHTML = `
-        <p>Unsupported file type.</p>
-      `;
-    }
-    // Calculate available height for the image (can be placed before the if/else block)
-    const windowHeight = window.innerHeight;
-    const previewHeight = 100; // Adjust based on preview bar height
-    const availableHeight = windowHeight - previewHeight - 50; // Include padding/margins
+    // Add event listeners for clicking on preview thumbnails
+    const previewThumbnails = document.querySelectorAll('.image-preview');
+    previewThumbnails.forEach((thumbnail, i) => {
+      thumbnail.addEventListener('click', () => {
+        openImageModal(i, images);
+      });
+    });
   }
 
   function getPreviewThumbnails(index, images) {
