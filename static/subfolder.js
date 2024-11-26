@@ -128,6 +128,12 @@ async function loadSubfolderContents(subfolder) {
 
         document.getElementById('subfolderName').innerText = subfolder;
 
+        // Clear existing content to prevent duplication
+        document.getElementById('foldersList').innerHTML = '';
+        document.getElementById('videosList').innerHTML = '';
+        document.getElementById('imagesList').innerHTML = '';
+        document.getElementById('miscList').innerHTML = '';
+
         const foldersList = document.getElementById('foldersList');
         let hasSubfolders = false;
         data.folders.forEach(folder => {
@@ -255,6 +261,9 @@ function initPhotoSwipeFromDOM(gallerySelector) {
             index: index,
             getThumbBoundsFn: (index) => {
                 const thumbnail = items[index].el;
+                if (!thumbnail) {
+                    return { x: 0, y: 0, w: 0 };
+                }
                 const pageYScroll = window.pageYOffset || document.documentElement.scrollTop;
                 const rect = thumbnail.getBoundingClientRect();
                 return { x: rect.left, y: rect.top + pageYScroll, w: rect.width };
