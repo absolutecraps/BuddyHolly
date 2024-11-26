@@ -85,6 +85,7 @@ async function populateNavbarFolders() {
         console.error("Error fetching folders for navbar:", error);
     }
 }
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Loading subfolder page...");
     await loadNavbar();
@@ -106,6 +107,19 @@ function clearContent(elementIds) {
             element.innerHTML = '';
         }
     });
+}
+
+// Helper functions for creating list items
+function createSubfolderListItem(folder, subfolder) {
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `<a href="subfolder.html?folder=${subfolder}/${folder}">${folder}</a>`;
+    return listItem;
+}
+
+function createMiscListItem(file) {
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `<a href="${file.url}">${file.name}</a>`;
+    return listItem;
 }
 async function loadSubfolderContents(subfolder) {
     try {
@@ -178,6 +192,8 @@ async function loadSubfolderContents(subfolder) {
         console.error("Error fetching subfolder contents:", error);
     }
 }
+
+
 function createVideoItem(video, index) {
     const col = document.createElement('div');
     col.className = 'col-md-4';
@@ -200,7 +216,7 @@ function createVideoItem(video, index) {
     return col;
 }
 
-function createImageItem(image, index, gallerySelector) {
+function createImageItem(image, index) {
     const col = document.createElement('div');
     col.className = 'col-md-4';
 
@@ -226,6 +242,7 @@ function createImageItem(image, index, gallerySelector) {
 
     return col;
 }
+
 function initPhotoSwipeFromDOM(gallerySelector) {
     const parseThumbnailElements = function(el) {
         const items = [];
