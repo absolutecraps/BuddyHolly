@@ -306,7 +306,10 @@ function initPhotoSwipeFromDOM(gallerySelector) {
         galleryElement.addEventListener('click', function(e) {
             if (e.target.tagName === 'IMG' || e.target.tagName === 'A') {
                 e.preventDefault();
-                openPhotoSwipe(parseInt(e.target.dataset.index, 10), galleryElement);
+                const index = parseInt(e.target.dataset.index, 10);
+                const type = e.target.dataset.type;
+                console.log(`Opening ${type} with index: ${index}`);
+                openPhotoSwipe(index, galleryElement);
             }
         });
     });
