@@ -127,30 +127,30 @@ async function loadSubfolderContents(subfolder) {
 
         // Populate videos
         data.videos.forEach((video) => {
-            const thumbnailUrl = video.thumbnail_url;
-            const fullImageUrl = thumbnailUrl.replace('_tn.jpg', '.jpg');
-            const videoUrl = video.url.replace('_tn.jpg', '.mp4');
+            const thumbnailUrl = video.thumbnail_url || `${video.url.replace('.mp4', '.mp4_tn.jpg')}`;
+            const fullImageUrl = video.url.replace('.mp4', '.mp4.jpg');
+            const videoUrl = video.url;
             const listItem = createGLightboxItem(thumbnailUrl, videoUrl, 'video');
             videosList.appendChild(listItem);
         });
 
-        // Display message if folder is empty
-        if (data.images.length === 0 && data.videos.length === 0 && data.folders.length === 0) {
-            const container = document.querySelector('.container');
+        // Handle empty folder
+        if (!data.images.length && !data.videos.length && !data.folders.length) {
             const emptyMessage = document.createElement('p');
             emptyMessage.textContent = "This folder is empty.";
             emptyMessage.style.textAlign = 'center';
             emptyMessage.style.marginTop = '20px';
-            container.appendChild(emptyMessage);
+            document.querySelector('.container').appendChild(emptyMessage);
         }
 
-        initializeGLightbox(); // Reinitialize GLightbox after adding new items
+        initializeGLightbox(); // Reinitialize GLightbox
     } catch (error) {
         console.error("Error loading subfolder contents:", error);
     } finally {
         loadingIndicator.style.display = 'none'; // Hide loading indicator
     }
 }
+
 
 function createGLightboxItem(thumbnailUrl, fullUrl, type) {
     const col = document.createElement('div');
@@ -161,7 +161,11 @@ function createGLightboxItem(thumbnailUrl, fullUrl, type) {
     a.className = 'glightbox';
 
     if (type === 'video') {
-        a.dataset.type = 'video';
+        a.dataset.type = 'video'; // Specify that this is a video
+        const playButton = document.createElement('div');
+        playButton.className = 'play-button'; // Add a play button overlay
+        playButton.textContent = '▶'; // Play symbol
+        a.appendChild(playButton);
     }
 
     const img = document.createElement('img');
