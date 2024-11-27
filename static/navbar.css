@@ -21,3 +21,8 @@
     max-height: 400px;
     overflow-y: auto;
 }
+
+.nav-link:hover {
+    background-color: #f8f9fa; /* Light gray background on hover */
+    color: #343a40; /* Dark color for the text on hover */
+}

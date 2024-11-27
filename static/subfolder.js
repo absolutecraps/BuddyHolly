@@ -47,16 +47,6 @@ async function populateNavbarFolders() {
     }
 }
 
-// Initialize GLightbox
-function initializeGLightbox() {
-    GLightbox({
-        selector: '.glightbox',
-        touchNavigation: true,
-        loop: true,
-        autoplayVideos: true
-    });
-}
-
 // Clear content of specified elements
 function clearContent(elementIds) {
     elementIds.forEach(id => {
@@ -68,6 +58,7 @@ function clearContent(elementIds) {
 }
 
 // Load the navbar and initialize subfolder contents
+// Initialize the navbar and subfolder contents
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("Initializing subfolder page...");
     await loadNavbar();
@@ -77,10 +68,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (subfolder) {
         console.log(`Subfolder parameter found: ${subfolder}`);
         await loadSubfolderContents(subfolder);
+
+        // Initialize GLightbox after loading the subfolder contents
+        initializeGLightbox();
     } else {
         console.error('No subfolder specified in the URL');
     }
 });
+
+// GLightbox initialization function
+function initializeGLightbox() {
+    GLightbox({
+        selector: '.glightbox',
+        touchNavigation: true,
+        loop: true,
+        autoplayVideos: true
+    });
+}
+
 
 async function loadSubfolderContents(subfolder) {
     const loadingIndicator = document.getElementById('loadingIndicator');
