@@ -1,32 +1,21 @@
-.dropdown:hover .dropdown-menu {
-            display: block;
-            margin-top: 0;
-        }
-        .dropdown-menu {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .dropdown-toggle::after {
-            display: none; /* Remove caret from dropdown */
-        }
-        .file-thumbnail:hover {
-            cursor: pointer;
-        }
-        .preview-thumbnail:hover {
-            cursor: pointer;
-        }
-
-/* Unified Thumbnail Styling */
 .file-thumbnail, .preview-thumbnail {
     display: block;
     width: 100%;
     height: auto;
     cursor: pointer;
-    border-radius: 5px; /* Optional: Add rounded corners */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+    border-radius: 5px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .file-thumbnail:hover, .preview-thumbnail:hover {
-    transform: scale(1.05); /* Slight zoom */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow effect */
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0;
+}
+.dropdown-menu {
+    max-height: 400px;
+    overflow-y: auto;
 }

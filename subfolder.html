@@ -1,56 +1,39 @@
-<!-- Updated for GLightbox Integration - November 2024 -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subfolder Contents</title>
-    <link href="static/bootstrap.min.css" rel="stylesheet"> <!-- Use local Bootstrap CSS file -->
-    <link rel="stylesheet" href="static/subfolder.css"> <!-- Your existing CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"> <!-- GLightbox CSS -->
+    <link href="static/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/subfolder.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
 </head>
 <body>
-    <!-- Navbar Placeholder -->
     <div id="navbar"></div>
-
     <div class="container mt-5">
-        <!-- Subfolder Name -->
         <h1 id="subfolderName" class="mb-5">Subfolder Contents</h1>
-
-        <!-- Loading Indicator -->
         <div id="loadingIndicator" style="display: none; text-align: center; margin-top: 20px;">
             <p>Loading...</p>
         </div>
-
-        <!-- Sections for displaying subfolder contents -->
         <div id="foldersSection">
             <h2>Folders</h2>
             <ul id="foldersList" class="list-unstyled"></ul>
         </div>
-        
         <div id="videosSection" class="mt-4">
             <h2>Videos</h2>
-            <div class="row" id="videosList">
-                <!-- Video thumbnails will be dynamically added here -->
-            </div>
+            <div class="row" id="videosList"></div>
         </div>
-
         <div id="imagesSection" class="mt-4">
             <h2>Images</h2>
-            <div class="row" id="imagesList">
-                <!-- Image thumbnails will be dynamically added here -->
-            </div>
+            <div class="row" id="imagesList"></div>
         </div>
-        
         <div id="miscSection" class="mt-4">
             <h2>Miscellaneous Files</h2>
             <ul id="miscList" class="list-unstyled"></ul>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script> <!-- GLightbox JS -->
-    <script src="static/bootstrap.bundle.min.js"></script> <!-- Use local Bootstrap JS file -->
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script src="static/bootstrap.bundle.min.js"></script>
     <script src="static/subfolder.js"></script>
 </body>
 </html>
