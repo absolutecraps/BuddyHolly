@@ -119,19 +119,20 @@ async function loadSubfolderContents(subfolder) {
             }
         });
 
-        // Populate images
-        data.images.forEach((image) => {
-            if (image.url.includes('/thumbnail/')) {
-                const thumbnailUrl = `${subfolder}/thumbnail/${image.url.split('/').pop()}`; // Path to thumbnail
-                const fullSizeUrl = `${subfolder}/${image.url
-                    .split('/')
-                    .pop()
-                    .replace('_tn.jpg', '.jpg')}`; // Path to full-sized image
+            // Populate images
+            data.images.forEach((image) => {
+                if (image.url.includes('/thumbnail/')) {
+                    const thumbnailUrl = `${subfolder}/thumbnail/${image.url.split('/').pop()}`; // Path to thumbnail
+                    const fullSizeUrl = `${subfolder}/${image.url.split('/').pop().replace('_tn.jpg', '.jpg')}`; // Path to full-sized image
 
-                const listItem = createGLightboxItem(thumbnailUrl, fullSizeUrl, 'image');
-                imagesList.appendChild(listItem);
-            }
-        });
+                    console.log("Thumbnail URL:", thumbnailUrl); // Log thumbnail path
+                    console.log("Full-size URL:", fullSizeUrl); // Log full-size image path
+
+                    const listItem = createGLightboxItem(thumbnailUrl, fullSizeUrl, 'image');
+                    imagesList.appendChild(listItem);
+                }
+            });
+
 
         // Populate videos
         data.videos.forEach((video) => {
