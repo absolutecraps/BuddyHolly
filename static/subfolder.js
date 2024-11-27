@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadSubfolderContents(subfolder) {
     const loadingIndicator = document.getElementById('loadingIndicator');
-    loadingIndicator.style.display = 'block'; // Show loading indicator
+    loadingIndicator.style.display = 'block';
 
     try {
         console.log(`Fetching contents of subfolder: ${subfolder}`);
@@ -105,7 +105,7 @@ async function loadSubfolderContents(subfolder) {
         const videosList = document.getElementById('videosList');
 
         // Populate folders
-        data.folders.forEach(folder => {
+        data.folders.forEach((folder) => {
             if (folder !== "thumbnail" && folder !== "tn") {
                 const listItem = document.createElement('li');
                 const link = document.createElement('a');
@@ -118,45 +118,41 @@ async function loadSubfolderContents(subfolder) {
 
         // Populate images
         data.images.forEach((image) => {
-            const isThumbnail = image.url.includes('/thumbnail/');
-            const thumbnailUrl = image.url;
-            const fullSizeUrl = isThumbnail
-                ? image.url.replace('/thumbnail/', '/').replace('_tn.jpg', '.jpg')
-                : image.url;
+            if (image.url.includes('/thumbnail/')) {
+                const thumbnailUrl = `${subfolder}/thumbnail/${image.url.split('/').pop()}`; // Path to thumbnail
+                const fullSizeUrl = `${subfolder}/${image.url
+                    .split('/')
+                    .pop()
+                    .replace('_tn.jpg', '.jpg')}`; // Path to full-sized image
 
-            const listItem = createGLightboxItem(thumbnailUrl, fullSizeUrl, 'image');
-            imagesList.appendChild(listItem);
+                const listItem = createGLightboxItem(thumbnailUrl, fullSizeUrl, 'image');
+                imagesList.appendChild(listItem);
+            }
         });
-        console.log("Images data:", data.images);
 
         // Populate videos
-        data.videos.forEach(video => {
-            const thumbnailUrl = video.thumbnail_url || `${video.url.replace('.mp4', '.mp4_tn.jpg')}`;
-            const fullImageUrl = video.url.replace('.mp4', '.mp4.jpg');
-            const videoUrl = video.url;
+        data.videos.forEach((video) => {
+            const thumbnailUrl = `${subfolder}/thumbnail/${video.url
+                .split('/')
+                .pop()
+                .replace('.mp4', '_tn.jpg')}`; // Path to video thumbnail
+            const videoUrl = `${subfolder}/${video.url.split('/').pop()}`; // Path to video
+            const fullImageUrl = `${subfolder}/${video.url
+                .split('/')
+                .pop()
+                .replace('.mp4', '.mp4.jpg')}`; // Path to video preview image
 
             const listItem = createGLightboxItem(thumbnailUrl, videoUrl, 'video');
             videosList.appendChild(listItem);
         });
 
-        // Handle empty folder
-        if (!data.images.length && !data.videos.length && !data.folders.length) {
-            const emptyMessage = document.createElement('p');
-            emptyMessage.textContent = "This folder is empty.";
-            emptyMessage.style.textAlign = 'center';
-            emptyMessage.style.marginTop = '20px';
-            document.querySelector('.container').appendChild(emptyMessage);
-        }
-
-        initializeGLightbox(); // Reinitialize GLightbox
+        initializeGLightbox();
     } catch (error) {
         console.error("Error loading subfolder contents:", error);
     } finally {
-        loadingIndicator.style.display = 'none'; // Hide loading indicator
+        loadingIndicator.style.display = 'none';
     }
 }
-
-
 
 function createGLightboxItem(thumbnailUrl, fullUrl, type) {
     const col = document.createElement('div');
@@ -169,8 +165,8 @@ function createGLightboxItem(thumbnailUrl, fullUrl, type) {
     if (type === 'video') {
         a.dataset.type = 'video'; // Specify that this is a video
         const playButton = document.createElement('div');
-        playButton.className = 'play-button'; // Add a play button overlay
-        playButton.textContent = '▶'; // Play symbol
+        playButton.className = 'play-button';
+        playButton.textContent = '▶'; // Add play button overlay
         a.appendChild(playButton);
     }
 
