@@ -49,10 +49,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = await response.json();
     data.folders.forEach(folder => {
         const item = document.createElement('li');
-        item.className = 'list-group-item'; // Add proper styling
-        item.innerHTML = `<a href="subfolder.html?folder=${folder}">${folder}</a>`;
+        item.className = 'list-group-item'; // Bootstrap styling
+        item.innerHTML = `<a href="subfolder.html?folder=${folder}" class="text-decoration-none">${folder}</a>`;
         contentList.appendChild(item);
     });
+    
 });
 
     await loadNavbar();

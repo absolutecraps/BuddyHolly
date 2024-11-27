@@ -26,3 +26,18 @@
     background-color: #f8f9fa; /* Light gray background on hover */
     color: #343a40; /* Dark color for the text on hover */
 }
+
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.navbar-brand:hover {
+    color: #0056b3;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
