@@ -248,22 +248,6 @@ function openVideoModal(imageUrl, videoUrl, currentIndex) {
     modal.show();
 }
 
-
-    const playButton = document.getElementById('playButton');
-    playButton.addEventListener('click', () => {
-        const videoElement = document.createElement('video');
-        videoElement.controls = true;
-        videoElement.style.width = '100%';
-        videoElement.src = videoUrl.replace('.jpg', '.mp4'); // Replace .jpg with .mp4 to get the video file
-        modalContent.innerHTML = '';
-        modalContent.appendChild(videoElement);
-        videoElement.play();
-    });
-
-    const modal = new bootstrap.Modal(document.getElementById('fileModal'));
-    modal.show();
-}
-
 // Generate video preview thumbnails
 function getVideoPreviewThumbnails(currentIndex) {
     return data.videos
