@@ -85,3 +85,11 @@ async function loadNavbar() {
                 contentList.appendChild(listItem);
             });
         });
+
+// Show or hide the loading indicator
+function setLoadingIndicator(visible) {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = visible ? 'block' : 'none';
+    }
+}

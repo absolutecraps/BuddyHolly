@@ -4,53 +4,21 @@
     width: 100%; /* Standardized size */
     height: auto;
     cursor: pointer;
+    border-radius: 5px; /* Optional: Add some styling for better visuals */
+    transition: transform 0.3s ease; /* Smooth zoom effect */
 }
 
-/* Modal image styling */
-.modal-image {
-    display: block;
-    margin: 0 auto;
-    max-width: 100%;
-    max-height: calc(100vh - 150px); /* Adjust for modal padding */
-    object-fit: contain; /* Maintain aspect ratio */
+.file-thumbnail:hover {
+    transform: scale(1.05); /* Slight zoom on hover */
 }
 
-/* Modal content */
-.modal-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 100%;
-    max-height: calc(100vh - 150px);
-}
-
-/* Center modal vertically */
-.modal-dialog-centered {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: calc(100vh - 1rem); /* Center the modal vertically */
-}
-
-/* Modal background */
-.modal, .pswp__bg {
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-/* Play button styling */
+/* Play button styling (for videos) */
 #playButton {
-    display: block; /* Default to visible */
+    display: block;
     margin-top: 20px;
 }
 
-.modal-file {
-    display: block;
-    margin: 0 auto;
-    max-width: 100%;
-    max-height: calc(100vh - 150px);
-    object-fit: contain; /* Maintain aspect ratio */
-}
-
+/* Thumbnail container styling */
 .image-previews {
     display: flex;
     justify-content: center;
@@ -62,8 +30,24 @@
     width: 50px;
     height: 50px;
     cursor: pointer;
+    border-radius: 3px; /* Optional: Add rounded corners */
+    transition: transform 0.3s ease;
 }
 
+.image-previews img:hover {
+    transform: scale(1.1);
+}
+
+/* GLightbox Modal Tweaks */
+.glightbox-container {
+    background-color: rgba(0, 0, 0, 0.9); /* Adjust modal background */
+}
+
+.glightbox-slide img {
+    max-width: 100%;
+    max-height: calc(100vh - 150px);
+    object-fit: contain; /* Maintain aspect ratio */
+}
 
 /* Close button */
 .close {
@@ -74,5 +58,9 @@
     font-weight: bold;
     color: #fff;
     cursor: pointer;
+    transition: color 0.3s ease;
 }
 
+.close:hover {
+    color: #ff0000; /* Highlight the close button on hover */
+}

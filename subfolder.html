@@ -1,4 +1,4 @@
-<!--  Created using ChatGPT, Gemini and Copilot Novemeber 2024 -->
+<!-- Updated for GLightbox Integration - November 2024 -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,75 +8,48 @@
     <title>Subfolder Contents</title>
     <link href="static/bootstrap.min.css" rel="stylesheet"> <!-- Use local Bootstrap CSS file -->
     <link rel="stylesheet" href="static/subfolder.css"> <!-- Your existing CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css"> <!-- Photoswipe CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css"> <!-- Photoswipe Skin CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"> <!-- GLightbox CSS -->
 </head>
 <body>
-    <div id="navbar"></div> <!-- Navbar will be dynamically loaded here -->
+    <!-- Navbar Placeholder -->
+    <div id="navbar"></div>
 
     <div class="container mt-5">
+        <!-- Subfolder Name -->
         <h1 id="subfolderName" class="mb-5">Subfolder Contents</h1>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" style="display: none; text-align: center; margin-top: 20px;">
+            <p>Loading...</p>
+        </div>
 
         <!-- Sections for displaying subfolder contents -->
         <div id="foldersSection">
             <h2>Folders</h2>
             <ul id="foldersList" class="list-unstyled"></ul>
         </div>
-
+        
         <div id="videosSection" class="mt-4">
             <h2>Videos</h2>
-            <div class="row" id="videosList"></div>
+            <div class="row" id="videosList">
+                <!-- Video thumbnails will be dynamically added here -->
+            </div>
         </div>
 
         <div id="imagesSection" class="mt-4">
             <h2>Images</h2>
-            <div class="row" id="imagesList"></div>
+            <div class="row" id="imagesList">
+                <!-- Image thumbnails will be dynamically added here -->
+            </div>
         </div>
-
+        
         <div id="miscSection" class="mt-4">
             <h2>Miscellaneous Files</h2>
             <ul id="miscList" class="list-unstyled"></ul>
         </div>
     </div>
 
-    <!-- Photoswipe Root elements -->
-    <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="pswp__bg"></div>
-        <div class="pswp__scroll-wrap">
-            <div class="pswp__container">
-                <div class="pswp__item"></div>
-                <div class="pswp__item"></div>
-                <div class="pswp__item"></div>
-            </div>
-            <div class="pswp__ui pswp__ui--hidden">
-                <div class="pswp__top-bar">
-                    <div class="pswp__counter"></div>
-                    <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-                    <button class="pswp__button pswp__button--share" title="Share"></button>
-                    <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-                    <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-                    <div class="pswp__preloader">
-                        <div class="pswp__preloader__icn">
-                            <div class="pswp__preloader__cut">
-                                <div class="pswp__preloader__donut"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                    <div class="pswp__share-tooltip"></div>
-                </div>
-                <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
-                <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button>
-                <div class="pswp__caption">
-                    <div class="pswp__caption__center"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script> <!-- Photoswipe JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script> <!-- Photoswipe UI JS -->
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script> <!-- GLightbox JS -->
     <script src="static/bootstrap.bundle.min.js"></script> <!-- Use local Bootstrap JS file -->
     <script src="static/subfolder.js"></script>
 </body>

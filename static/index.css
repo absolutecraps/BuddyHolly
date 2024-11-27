@@ -15,3 +15,18 @@
         .preview-thumbnail:hover {
             cursor: pointer;
         }
+
+/* Unified Thumbnail Styling */
+.file-thumbnail, .preview-thumbnail {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    border-radius: 5px; /* Optional: Add rounded corners */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+.file-thumbnail:hover, .preview-thumbnail:hover {
+    transform: scale(1.05); /* Slight zoom */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow effect */
+}
