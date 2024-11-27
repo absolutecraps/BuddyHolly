@@ -49,11 +49,11 @@ async function populateNavbarFolders() {
 
 // Initialize GLightbox
 function initializeGLightbox() {
-    const lightbox = GLightbox({
-        selector: '.glightbox', // Target all anchor elements with this class
+    GLightbox({
+        selector: '.glightbox',
         touchNavigation: true,
         loop: true,
-        autoplayVideos: true,
+        autoplayVideos: true
     });
 }
 
@@ -103,6 +103,7 @@ async function loadSubfolderContents(subfolder) {
         const imagesList = document.getElementById('imagesList');
         const foldersList = document.getElementById('foldersList');
         const videosList = document.getElementById('videosList');
+        const miscList = document.getElementById('miscList');
 
         // Populate folders
         data.folders.forEach((folder) => {
@@ -137,13 +138,19 @@ async function loadSubfolderContents(subfolder) {
                 .pop()
                 .replace('.mp4', '_tn.jpg')}`; // Path to video thumbnail
             const videoUrl = `${subfolder}/${video.url.split('/').pop()}`; // Path to video
-            const fullImageUrl = `${subfolder}/${video.url
-                .split('/')
-                .pop()
-                .replace('.mp4', '.mp4.jpg')}`; // Path to video preview image
 
             const listItem = createGLightboxItem(thumbnailUrl, videoUrl, 'video');
             videosList.appendChild(listItem);
+        });
+
+        // Populate miscellaneous files
+        data.misc.forEach((file) => {
+            const listItem = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = `${subfolder}/${file.url.split('/').pop()}`;
+            link.textContent = file.url.split('/').pop();
+            listItem.appendChild(link);
+            miscList.appendChild(listItem);
         });
 
         initializeGLightbox();
@@ -161,12 +168,12 @@ function createGLightboxItem(thumbnailUrl, fullUrl, type) {
     const a = document.createElement('a');
     a.href = fullUrl;
     a.className = 'glightbox';
+    a.dataset.gallery = 'gallery1';
 
     if (type === 'video') {
         a.dataset.type = 'video'; // Specify that this is a video
         const playButton = document.createElement('div');
         playButton.className = 'play-button';
-        playButton.textContent = '▶'; // Add play button overlay
         a.appendChild(playButton);
     }
 

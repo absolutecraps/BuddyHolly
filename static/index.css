@@ -11,10 +11,12 @@
     transform: scale(1.05);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
 .dropdown:hover .dropdown-menu {
     display: block;
     margin-top: 0;
 }
+
 .dropdown-menu {
     max-height: 400px;
     overflow-y: auto;
