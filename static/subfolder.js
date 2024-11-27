@@ -126,10 +126,10 @@ function createMiscListItem(file) {
     listItem.innerHTML = `<a href="${file.url}">${file.name}</a>`;
     return listItem;
 }
-// Update loadSubfolderContents to include the new gallery initialization
+
 async function loadSubfolderContents(subfolder) {
     try {
-        console.log("Fetching subfolder contents...");
+        console.log(`Fetching contents of subfolder: ${subfolder}`);
         const response = await fetch(`https://media-gallery.justsoicanpostheretoday.workers.dev/files/${subfolder}`);
         if (!response.ok) {
             console.error("Failed to fetch subfolder contents:", response.status, response.statusText);
@@ -137,71 +137,117 @@ async function loadSubfolderContents(subfolder) {
         }
 
         const data = await response.json();
-        console.log("Subfolder contents fetched:", data);
+        console.log("Subfolder contents:", data);
 
         document.getElementById('subfolderName').textContent = subfolder;
 
+        // Clear content sections
         clearContent(['foldersList', 'videosList', 'imagesList', 'miscList']);
 
-        const foldersList = document.getElementById('foldersList');
-        data.folders.forEach((folder) => {
-            if (folder === "thumbnail" || folder === "tn") return; // Exclude "thumbnail" and "tn"
-            const listItem = createSubfolderListItem(folder, subfolder);
-            foldersList.appendChild(listItem);
-        });
-
         const imagesList = document.getElementById('imagesList');
+        const videosList = document.getElementById('videosList');
+
+        // Populate images and videos from the thumbnail folder
         data.images.forEach((image, index) => {
-            const imageItem = createImageItem(image, index);
-            imagesList.appendChild(imageItem);
+            if (image.url.includes('/thumbnail/')) {
+                const fullSizeUrl = image.url.replace('/thumbnail/', '/').replace('_tn.jpg', '.jpg');
+                const listItem = createThumbnailItem(image.url, fullSizeUrl, index, 'image');
+                imagesList.appendChild(listItem);
+            }
         });
 
-        const videosList = document.getElementById('videosList');
         data.videos.forEach((video, index) => {
-            const videoItem = createVideoItem(video, index);
-            videosList.appendChild(videoItem);
+            const thumbnailUrl = video.thumbnail_url; // Thumbnail URL (e.g., video1_tn.jpg)
+            const fullImageUrl = thumbnailUrl.replace('_tn.jpg', '.jpg'); // Full image URL (e.g., video1.jpg)
+            const videoUrl = video.url.replace('_tn.jpg', '.mp4'); // Video file URL (e.g., video1.mp4)
+            const listItem = createThumbnailItem(thumbnailUrl, fullImageUrl, index, 'video', videoUrl);
+            videosList.appendChild(listItem);
         });
 
         initPhotoSwipeFromDOM('#imagesSection, #videosSection');
     } catch (error) {
-        console.error("Error fetching subfolder contents:", error);
+        console.error("Error loading subfolder contents:", error);
     }
 }
 
-
-
-function createVideoItem(video, index) {
+// Helper function to create a thumbnail item
+function createThumbnailItem(thumbnailUrl, fullUrl, index, type, videoUrl = null) {
     const col = document.createElement('div');
     col.className = 'col-md-4';
-
-    const thumbnailUrl = video.thumbnail_url;
-    const videoUrl = video.url.replace('_tn', ''); // Get the full video image (e.g., video1.jpg)
 
     const img = document.createElement('img');
     img.src = thumbnailUrl;
     img.className = 'img-thumbnail file-thumbnail';
-    img.alt = `Video ${index}`;
-    img.dataset.type = 'video';
+    img.alt = `Thumbnail ${index}`;
+    img.dataset.type = type;
     img.dataset.index = index;
 
-    img.addEventListener('click', () => openVideoModal(videoUrl, index)); // Open the video modal on click
+    if (type === 'video') {
+        img.addEventListener('click', () => openVideoModal(fullUrl, videoUrl, index));
+    } else {
+        img.addEventListener('click', () => openImageModal(fullUrl, index));
+    }
 
     col.appendChild(img);
     return col;
 }
 
-// Open video modal
-function openVideoModal(videoUrl, index) {
+function getPreviewThumbnails(currentIndex, type) {
+    const items = type === 'image' ? data.images : data.videos;
+    return items
+        .map((item, index) => {
+            if (index === currentIndex) return ''; // Skip current item
+            const thumbnailUrl = item.url.includes('/thumbnail/') ? item.url : item.thumbnail_url;
+            const fullUrl = thumbnailUrl.replace('_tn.jpg', '.jpg');
+            const videoUrl = type === 'video' ? fullUrl.replace('.jpg', '.mp4') : null;
+
+            return `<img src="${thumbnailUrl}" class="preview-thumbnail" onclick="${
+                type === 'video' ? `openVideoModal('${fullUrl}', '${videoUrl}', ${index})` : `openImageModal('${fullUrl}', ${index})`
+            }">`;
+        })
+        .join('');
+}
+
+
+function openImageModal(imageUrl, currentIndex) {
     const modalContent = document.getElementById('modalContent');
     modalContent.innerHTML = `
-        <div style="text-align: center;">
-            <img src="${videoUrl}" class="modal-file" alt="Video">
-            <button id="playButton" class="btn btn-primary mt-3">Play Video</button>
-            <div class="image-previews mt-3">
-                ${getVideoPreviewThumbnails(index)}
-            </div>
+        <img src="${imageUrl}" class="modal-file" alt="Full Image">
+        <div class="image-previews mt-3">
+            ${getPreviewThumbnails(currentIndex, 'image')}
         </div>
     `;
+
+    const modal = new bootstrap.Modal(document.getElementById('fileModal'));
+    modal.show();
+}
+
+
+// Open video modal
+function openVideoModal(imageUrl, videoUrl, currentIndex) {
+    const modalContent = document.getElementById('modalContent');
+    modalContent.innerHTML = `
+        <img src="${imageUrl}" class="modal-file" alt="Video Thumbnail">
+        <button id="playButton" class="btn btn-primary mt-3">Play Video</button>
+        <div class="image-previews mt-3">
+            ${getPreviewThumbnails(currentIndex, 'video')}
+        </div>
+    `;
+
+    const playButton = document.getElementById('playButton');
+    playButton.addEventListener('click', () => {
+        modalContent.innerHTML = `
+            <video controls autoplay style="width:100%;">
+                <source src="${videoUrl}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        `;
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById('fileModal'));
+    modal.show();
+}
+
 
     const playButton = document.getElementById('playButton');
     playButton.addEventListener('click', () => {
