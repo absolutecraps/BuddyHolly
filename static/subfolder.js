@@ -1,6 +1,5 @@
 /*  Created using ChatGPT, Gemini and Copilot November 2024 */
 
-let data;
 
 async function loadNavbar() {
     try {
@@ -129,6 +128,8 @@ function createMiscListItem(file) {
     return listItem;
 }
 
+let currentData; // Declare globally
+
 async function loadSubfolderContents(subfolder) {
     try {
         console.log(`Fetching contents of subfolder: ${subfolder}`);
@@ -138,19 +139,18 @@ async function loadSubfolderContents(subfolder) {
             return;
         }
 
-        const data = await response.json();
-        console.log("Subfolder contents:", data);
+        currentData = await response.json(); // Store in global variable
+        console.log("Subfolder contents:", currentData);
 
         document.getElementById('subfolderName').textContent = subfolder;
 
-        // Clear content sections
         clearContent(['foldersList', 'videosList', 'imagesList', 'miscList']);
 
         const imagesList = document.getElementById('imagesList');
         const videosList = document.getElementById('videosList');
 
         // Populate images and videos from the thumbnail folder
-        data.images.forEach((image, index) => {
+        currentData.images.forEach((image, index) => {
             if (image.url.includes('/thumbnail/')) {
                 const fullSizeUrl = image.url.replace('/thumbnail/', '/').replace('_tn.jpg', '.jpg');
                 const listItem = createThumbnailItem(image.url, fullSizeUrl, index, 'image');
@@ -158,10 +158,10 @@ async function loadSubfolderContents(subfolder) {
             }
         });
 
-        data.videos.forEach((video, index) => {
-            const thumbnailUrl = video.thumbnail_url; // Thumbnail URL (e.g., video1_tn.jpg)
-            const fullImageUrl = thumbnailUrl.replace('_tn.jpg', '.jpg'); // Full image URL (e.g., video1.jpg)
-            const videoUrl = video.url.replace('_tn.jpg', '.mp4'); // Video file URL (e.g., video1.mp4)
+        currentData.videos.forEach((video, index) => {
+            const thumbnailUrl = video.thumbnail_url;
+            const fullImageUrl = thumbnailUrl.replace('_tn.jpg', '.jpg');
+            const videoUrl = video.url.replace('_tn.jpg', '.mp4');
             const listItem = createThumbnailItem(thumbnailUrl, fullImageUrl, index, 'video', videoUrl);
             videosList.appendChild(listItem);
         });
@@ -171,6 +171,7 @@ async function loadSubfolderContents(subfolder) {
         console.error("Error loading subfolder contents:", error);
     }
 }
+
 
 // Helper function to create a thumbnail item
 function createThumbnailItem(thumbnailUrl, fullUrl, index, type, videoUrl = null) {
@@ -194,7 +195,7 @@ function createThumbnailItem(thumbnailUrl, fullUrl, index, type, videoUrl = null
     return col;
 }
 
-function getPreviewThumbnails(currentIndex, type) {
+function getPreviewThumbnails(currentIndex, type, data) {
     const items = type === 'image' ? data.images : data.videos;
     return items
         .map((item, index) => {
@@ -211,12 +212,13 @@ function getPreviewThumbnails(currentIndex, type) {
 }
 
 
+
 function openImageModal(imageUrl, currentIndex) {
     const modalContent = document.getElementById('modalContent');
     modalContent.innerHTML = `
         <img src="${imageUrl}" class="modal-file" alt="Full Image">
         <div class="image-previews mt-3">
-            ${getPreviewThumbnails(currentIndex, 'image')}
+            ${getPreviewThumbnails(currentIndex, 'image', currentData)}
         </div>
     `;
 
@@ -224,15 +226,13 @@ function openImageModal(imageUrl, currentIndex) {
     modal.show();
 }
 
-
-// Open video modal
 function openVideoModal(imageUrl, videoUrl, currentIndex) {
     const modalContent = document.getElementById('modalContent');
     modalContent.innerHTML = `
         <img src="${imageUrl}" class="modal-file" alt="Video Thumbnail">
         <button id="playButton" class="btn btn-primary mt-3">Play Video</button>
         <div class="image-previews mt-3">
-            ${getPreviewThumbnails(currentIndex, 'video')}
+            ${getPreviewThumbnails(currentIndex, 'video', currentData)}
         </div>
     `;
 
@@ -249,6 +249,7 @@ function openVideoModal(imageUrl, videoUrl, currentIndex) {
     const modal = new bootstrap.Modal(document.getElementById('fileModal'));
     modal.show();
 }
+
 
 // Generate video preview thumbnails
 function getVideoPreviewThumbnails(currentIndex) {
