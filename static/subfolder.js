@@ -101,11 +101,11 @@ async function loadSubfolderContents(subfolder) {
         clearContent(['foldersList', 'videosList', 'imagesList', 'miscList']);
 
         const imagesList = document.getElementById('imagesList');
-        const videosList = document.getElementById('videosList');
         const foldersList = document.getElementById('foldersList');
+        const videosList = document.getElementById('videosList');
 
         // Populate folders
-        data.folders.forEach((folder) => {
+        data.folders.forEach(folder => {
             if (folder !== "thumbnail" && folder !== "tn") {
                 const listItem = document.createElement('li');
                 const link = document.createElement('a');
@@ -118,18 +118,23 @@ async function loadSubfolderContents(subfolder) {
 
         // Populate images
         data.images.forEach((image) => {
-            if (image.url.includes('/thumbnail/')) {
-                const fullSizeUrl = image.url.replace('/thumbnail/', '/').replace('_tn.jpg', '.jpg');
-                const listItem = createGLightboxItem(image.url, fullSizeUrl, 'image');
-                imagesList.appendChild(listItem);
-            }
+            const isThumbnail = image.url.includes('/thumbnail/');
+            const thumbnailUrl = image.url;
+            const fullSizeUrl = isThumbnail
+                ? image.url.replace('/thumbnail/', '/').replace('_tn.jpg', '.jpg')
+                : image.url;
+
+            const listItem = createGLightboxItem(thumbnailUrl, fullSizeUrl, 'image');
+            imagesList.appendChild(listItem);
         });
+        console.log("Images data:", data.images);
 
         // Populate videos
-        data.videos.forEach((video) => {
+        data.videos.forEach(video => {
             const thumbnailUrl = video.thumbnail_url || `${video.url.replace('.mp4', '.mp4_tn.jpg')}`;
             const fullImageUrl = video.url.replace('.mp4', '.mp4.jpg');
             const videoUrl = video.url;
+
             const listItem = createGLightboxItem(thumbnailUrl, videoUrl, 'video');
             videosList.appendChild(listItem);
         });
@@ -150,6 +155,7 @@ async function loadSubfolderContents(subfolder) {
         loadingIndicator.style.display = 'none'; // Hide loading indicator
     }
 }
+
 
 
 function createGLightboxItem(thumbnailUrl, fullUrl, type) {
